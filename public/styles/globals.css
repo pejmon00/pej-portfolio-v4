@@ -1,0 +1,67 @@
+/* minimal reset and token application; no raw values here */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-foreground);
+  background: var(--color-bg);
+}
+
+/* accessible link styles */
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+a:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* header / navigation */
+header[role="banner"] {
+  padding: var(--space-2);
+}
+nav[role="navigation"] ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-2);
+}
+nav a {
+  padding: var(--space-1);
+  display: inline-block;
+}
+
+/* focus visible for keyboard users */
+button:focus-visible,
+a:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* main content spacing */
+main[role="main"] {
+  padding: var(--space-3);
+}
+
+/* ensure interactive touch targets meet 44px rule using token spacing */
+button,
+a {
+  min-height: calc(var(--space-2) * 2);
+  min-width: calc(var(--space-2) * 2);
+}
