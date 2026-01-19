@@ -24,7 +24,7 @@ const MIME = {
 function safeJoin(base, requestPath) {
   // normalize requestPath so absolute paths don't escape the base
   let rp = requestPath;
-  if (path.isAbsolute(rp)) rp = '.' + rp;
+  if (path.isAbsolute(rp)) rp = "." + rp;
   const joined = path.normalize(path.join(base, rp));
   if (!joined.startsWith(base)) return null; // prevent path traversal
   return joined;
@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
     pathname = decodeURIComponent(full.pathname || "/");
   } catch (e) {
     // fallback for unexpected input
-    pathname = decodeURIComponent(req.url.split('?')[0] || "/");
+    pathname = decodeURIComponent(req.url.split("?")[0] || "/");
   }
 
   // map "/" to "/index.html"
