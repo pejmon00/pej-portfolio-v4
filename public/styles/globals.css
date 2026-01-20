@@ -1,67 +1,257 @@
-/* minimal reset and token application; no raw values here */
-* {
+:root {
+  color-scheme: light dark;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
-html,
-body {
-  height: 100%;
-}
+
 body {
   margin: 0;
-  font-family: var(--font-family);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-base);
-  color: var(--color-foreground);
-  background: var(--color-bg);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--font-body);
 }
 
-/* accessible link styles */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 a {
-  color: var(--color-accent);
+  color: inherit;
   text-decoration: none;
 }
-a:focus-visible {
-  outline: var(--focus-ring);
+
+a:hover {
+  text-decoration: underline;
 }
 
-/* header / navigation */
-header[role="banner"] {
-  padding: var(--space-2);
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
-nav[role="navigation"] ul {
+
+/* Page shell */
+main {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+}
+
+/* Primary nav */
+nav[aria-label="Primary"] {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+nav[aria-label="Primary"] ul {
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
   display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+nav[aria-label="Primary"] a {
+  display: inline-flex;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
+}
+
+nav[aria-label="Primary"] a:hover {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+nav[aria-label="Primary"] a[aria-current="page"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* Secondary nav */
+nav[aria-label="Experience"],
+nav[aria-label="Writing"] {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+nav[aria-label="Experience"] ul,
+nav[aria-label="Writing"] ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
-nav a {
-  padding: var(--space-1);
-  display: inline-block;
+
+nav[aria-label="Experience"] a,
+nav[aria-label="Writing"] a {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
 }
 
-/* focus visible for keyboard users */
-button:focus-visible,
-a:focus-visible {
-  outline: var(--focus-ring);
+nav[aria-label="Experience"] a:hover,
+nav[aria-label="Writing"] a:hover {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
 }
 
-/* reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
-    animation: none !important;
+nav[aria-label="Experience"] a[aria-current="page"],
+nav[aria-label="Writing"] a[aria-current="page"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* Type rhythm */
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--space-3);
+  letter-spacing: var(--tracking-tight);
+}
+
+h1 {
+  font: var(--font-display);
+}
+
+h2 {
+  font: var(--font-h2);
+  margin-top: var(--space-8);
+}
+
+p {
+  margin: 0 0 var(--space-3);
+  max-width: var(--measure);
+  color: var(--text-muted);
+  line-height: var(--leading);
+}
+
+/* HERO layout: image left, content right */
+header[aria-labelledby="hero-title"] {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-4);
+  row-gap: var(--space-2);
+  align-items: start;
+}
+
+/* Put the image in the left column */
+header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
+  grid-column: 1;
+  grid-row: 1 / span 4; /* spans title + paragraphs */
+}
+
+/* Put all other hero content in the right column */
+header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
+  grid-column: 2;
+}
+
+/* Circle crop */
+header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] img {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--radius-round);
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile: stack */
+@media (max-width: 640px) {
+  header[aria-labelledby="hero-title"] {
+    grid-template-columns: 1fr;
+  }
+
+  header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
+    grid-column: 1;
   }
 }
 
-/* main content spacing */
-main[role="main"] {
-  padding: var(--space-3);
+/* Logo strip */
+section[aria-labelledby="credibility-title"] > div[aria-label="Company logos"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-2) 0 var(--space-2);
 }
 
-/* ensure interactive touch targets meet 44px rule using token spacing */
-button,
-a {
-  min-height: calc(var(--space-2) * 2);
-  min-width: calc(var(--space-2) * 2);
+section[aria-labelledby="credibility-title"] img {
+  height: var(--logo-h);
+  width: auto;
+  opacity: 0.85;
+}
+
+section[aria-labelledby="credibility-title"] img:hover {
+  opacity: 1;
+}
+
+/* Forms */
+form {
+  margin-top: var(--space-4);
+  max-width: var(--form-max);
+}
+
+label {
+  display: inline-block;
+  margin-bottom: var(--space-1);
+  color: var(--text);
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-2);
+  padding: var(--space-2);
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius-2);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--surface);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
 }
