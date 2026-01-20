@@ -10,19 +10,24 @@
   <body>
     <!-- Primary Navigation -->
     <nav aria-label="Primary">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/experience">Experience</a></li>
-        <li><a href="/writing" aria-current="page">Writing</a></li>
-      </ul>
+      <div class="nav-inner">
+        <a class="nav-logo" href="/" aria-label="Home">
+          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+        </a>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/experience">Experience</a></li>
+          <li><a href="/writing" aria-current="page">Writing</a></li>
+        </ul>
+      </div>
     </nav>
 
     <!-- Secondary Navigation: Writing (siblings-only) -->
     <nav aria-label="Writing">
       <ul>
         <li><a href="/writing" aria-current="page">Overview</a></li>
-        <li><a href="/writing/article-1">Article 1</a></li>
-        <li><a href="/writing/article-2">Article 2</a></li>
+        <li><a href="/writing/article-1">Article 01</a></li>
+        <li><a href="/writing/article-2">Article 02</a></li>
       </ul>
     </nav>
 
@@ -45,5 +50,22 @@
         on its own and is presented as originally published.
       </p>
     </main>
+
+    <footer aria-label="Site footer">
+      <div class="footer-inner">
+        <div class="footer-links" aria-label="Social links">
+          <a
+            href="https://www.linkedin.com/in/pejvosooghi/"
+            aria-label="LinkedIn"
+          >
+            <img src="/assets/icons/linkedin.svg" alt="" />
+          </a>
+          <a href="mailto:pejmon00@gmail.com" aria-label="GitHub">
+            <img src="/assets/icons/SendFill.svg" alt="" />
+          </a>
+        </div>
+        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+      </div>
+    </footer>
   </body>
 </html>

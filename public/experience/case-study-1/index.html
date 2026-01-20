@@ -12,11 +12,16 @@
   <body>
     <!-- Primary Navigation (FINAL IA) -->
     <nav aria-label="Primary">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/experience">Experience</a></li>
-        <li><a href="/writing">Writing</a></li>
-      </ul>
+      <div class="nav-inner">
+        <a class="nav-logo" href="/" aria-label="Home">
+          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+        </a>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/experience" aria-current="page">Experience</a></li>
+          <li><a href="/writing">Writing</a></li>
+        </ul>
+      </div>
     </nav>
 
     <!-- Secondary Navigation: Experience (siblings-only) -->
@@ -25,20 +30,20 @@
         <li><a href="/experience">Overview</a></li>
         <li>
           <a href="/experience/case-study-1" aria-current="page"
-            >Case Study 1</a
+            >Case Study 01</a
           >
         </li>
-        <li><a href="/experience/case-study-2">Case Study 2</a></li>
-        <li><a href="/experience/case-study-3">Case Study 3</a></li>
-        <li><a href="/experience/case-study-4">Case Study 4</a></li>
+        <li><a href="/experience/case-study-2">Case Study 02</a></li>
+        <li><a href="/experience/case-study-3">Case Study 03</a></li>
+        <li><a href="/experience/case-study-4">Case Study 04</a></li>
       </ul>
     </nav>
 
     <!-- Long-Form Template (shared across all case studies + articles) -->
     <main role="main">
       <header>
-        <h1>Case Study 01</h1>
-        <p>Tokenized Design System</p>
+        <h1>Tokenized Design System</h1>
+        <p>Case Study / 01</p>
       </header>
 
       <!-- Governed Hero Image Slot -->
@@ -123,5 +128,25 @@
         </div>
       </section>
     </main>
+
+    <footer aria-label="Site footer">
+      <div class="footer-inner">
+        <div class="footer-links" aria-label="Social links">
+          <a href="mailto:pejmon00@gmail.com" aria-label="Email">
+            <img src="/assets/icons/email.svg" alt="" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/YOUR_HANDLE"
+            aria-label="LinkedIn"
+          >
+            <img src="/assets/icons/linkedin.svg" alt="" />
+          </a>
+          <a href="https://github.com/YOUR_HANDLE" aria-label="GitHub">
+            <img src="/assets/icons/github.svg" alt="" />
+          </a>
+        </div>
+        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+      </div>
+    </footer>
   </body>
 </html>

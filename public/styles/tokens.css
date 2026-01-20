@@ -59,6 +59,10 @@
   /* hero image */
   --avatar-size: 220px;
   --radius-round: 9999px;
+  /* navigation */
+  --nav-height: 56px;
+  /* footer */
+  --footer-height: 56px;
 }
 
 /* Reduced motion token hook (future-safe) */
