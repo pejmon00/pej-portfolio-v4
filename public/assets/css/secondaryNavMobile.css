@@ -1,0 +1,73 @@
+/* secondaryNavMobile.css
+   Styles for the mobile-only collapsible secondary nav.
+   Only active when the page has JS (`html.js-secnav`) and on mobile widths.
+*/
+
+.secnav__toggle {
+  display: none; /* progressive enhancement: hidden without JS/mobile */
+}
+
+/* When JS is present and on mobile, show the toggle and enable collapse behavior */
+@media (max-width: 640px) {
+  html.js-secnav nav[data-secondary-nav] {
+    display: block;
+  }
+
+  html.js-secnav nav[data-secondary-nav] .secnav__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    border-radius: var(--radius-2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  /* alignment removed */
+
+  html.js-secnav nav[data-secondary-nav] .secnav__toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Hide the list when collapsed using the hidden attribute (set by JS) */
+  html.js-secnav nav[data-secondary-nav] ul[hidden] {
+    display: none;
+  }
+
+  /* When open, show the list as normal flow beneath the toggle */
+  html.js-secnav nav[data-secondary-nav].is-open ul {
+    display: block;
+  }
+
+  /* Give menu links comfortable tap targets */
+  html.js-secnav nav[data-secondary-nav] ul li a {
+    display: inline-flex;
+    padding: calc(var(--space-1)) var(--space-2);
+    border-radius: var(--radius-2);
+  }
+
+  /* Subtle transition for appearance when reduced motion is not requested */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js-secnav nav[data-secondary-nav] ul {
+      transition:
+        opacity 180ms ease,
+        transform 160ms ease;
+      transform-origin: top left;
+    }
+
+    html.js-secnav nav[data-secondary-nav] ul[hidden] {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    html.js-secnav nav[data-secondary-nav].is-open ul {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

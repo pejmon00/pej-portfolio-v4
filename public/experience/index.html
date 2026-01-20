@@ -6,12 +6,15 @@
     <title>Experience — Portfolio</title>
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
   </head>
   <body>
     <nav aria-label="Primary">
       <div class="nav-inner">
         <a class="nav-logo" href="/" aria-label="Home">
-          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+          <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
         </a>
         <ul>
           <li><a href="/">Home</a></li>
@@ -21,7 +24,7 @@
       </div>
     </nav>
 
-    <nav aria-label="Experience">
+    <nav aria-label="Experience" data-secondary-nav>
       <ul>
         <li><a href="/experience" aria-current="page">Overview</a></li>
         <li><a href="/experience/case-study-1">Case Study 01</a></li>
@@ -32,7 +35,20 @@
     </nav>
 
     <main role="main">
-      <h1>Experience</h1>
+      <!-- HERO (copied from Home) -->
+      <header aria-labelledby="hero-title">
+        <h1 id="hero-title">Experience</h1>
+        <p>Selected systems work, case studies, and outcomes.</p>
+        <!-- Hero image placeholder (governed slot) -->
+        <div aria-label="Hero image">
+          <img
+            src="/assets/images/_Hero_Image_1.png"
+            alt="Portrait of Pej Vosooghi"
+          />
+        </div>
+      </header>
+
+      <h2>Overview</h2>
       <p>
         These case studies reflect work on systems that operate across products,
         platforms, and organizations.
@@ -50,7 +66,7 @@
       <div class="footer-inner">
         <div class="footer-links" aria-label="Social links">
           <a href="mailto:pejmon00@gmail.com" aria-label="Email">
-            <img src="/assets/icons/email.svg" alt="" />
+            <img src="/assets/icons/SendFill.svg" alt="" />
           </a>
           <a
             href="https://www.linkedin.com/in/YOUR_HANDLE"
@@ -58,11 +74,8 @@
           >
             <img src="/assets/icons/linkedin.svg" alt="" />
           </a>
-          <a href="https://github.com/YOUR_HANDLE" aria-label="GitHub">
-            <img src="/assets/icons/github.svg" alt="" />
-          </a>
         </div>
-        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+        <div class="footer-copy">© 2026 - 2027 pej.me All Rights Reserved</div>
       </div>
     </footer>
   </body>

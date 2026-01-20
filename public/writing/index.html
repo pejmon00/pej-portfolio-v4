@@ -6,13 +6,15 @@
     <title>Writing — Portfolio</title>
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
   </head>
   <body>
     <!-- Primary Navigation -->
     <nav aria-label="Primary">
       <div class="nav-inner">
         <a class="nav-logo" href="/" aria-label="Home">
-          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+          <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
         </a>
         <ul>
           <li><a href="/">Home</a></li>
@@ -23,7 +25,7 @@
     </nav>
 
     <!-- Secondary Navigation: Writing (siblings-only) -->
-    <nav aria-label="Writing">
+    <nav aria-label="Writing" data-secondary-nav>
       <ul>
         <li><a href="/writing" aria-current="page">Overview</a></li>
         <li><a href="/writing/article-1">Article 01</a></li>
@@ -33,7 +35,20 @@
 
     <!-- Page Content -->
     <main role="main">
-      <h1>ARTICLES</h1>
+      <!-- HERO (copied from Home) -->
+      <header aria-labelledby="hero-title">
+        <h1 id="hero-title">Writing</h1>
+        <p>Personal reflections</p>
+        <!-- Hero image placeholder (governed slot) -->
+        <div aria-label="Hero image">
+          <img
+            src="/assets/images/_Hero_Image_2.png"
+            alt="Portrait of Pej Vosooghi"
+          />
+        </div>
+      </header>
+
+      <h2>Articles</h2>
       <p>
         These articles are published essays written outside the context of
         client work.
@@ -54,17 +69,17 @@
     <footer aria-label="Site footer">
       <div class="footer-inner">
         <div class="footer-links" aria-label="Social links">
+          <a href="mailto:pejmon00@gmail.com" aria-label="Email">
+            <img src="/assets/icons/SendFill.svg" alt="" />
+          </a>
           <a
-            href="https://www.linkedin.com/in/pejvosooghi/"
+            href="https://www.linkedin.com/in/YOUR_HANDLE"
             aria-label="LinkedIn"
           >
             <img src="/assets/icons/linkedin.svg" alt="" />
           </a>
-          <a href="mailto:pejmon00@gmail.com" aria-label="GitHub">
-            <img src="/assets/icons/SendFill.svg" alt="" />
-          </a>
         </div>
-        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+        <div class="footer-copy">© 2026 - 2027 pej.me All Rights Reserved</div>
       </div>
     </footer>
   </body>

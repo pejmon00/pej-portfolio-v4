@@ -62,7 +62,7 @@ main {
 /* Primary nav */
 nav[aria-label="Primary"] {
   width: 100%;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
 }
 
 nav[aria-label="Primary"] .nav-inner {
@@ -82,9 +82,19 @@ nav[aria-label="Primary"] .nav-logo {
 
 nav[aria-label="Primary"] .nav-logo img {
   display: block;
-  height: calc(var(--nav-height) - (var(--space-2)));
+  /* Use the governed logo token to ensure consistent, exact sizing */
+  height: var(--logo-h);
+  max-height: var(--logo-h);
   width: auto;
-  border-radius: var(--radius-round);
+  object-fit: contain;
+  border-radius: 0; /* avoid accidental clipping on logo SVGs */
+}
+
+/* Prevent any background-image from repeating if a background is used */
+nav[aria-label="Primary"] .nav-logo {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
 }
 
 nav[aria-label="Primary"] ul {
@@ -108,33 +118,54 @@ nav[aria-label="Primary"] a:hover {
   text-decoration: none;
 }
 
+/* Keep the logo visually stable on hover/focus (no background or color shift) */
+nav[aria-label="Primary"] .nav-logo:hover,
+nav[aria-label="Primary"] .nav-logo:focus {
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
 nav[aria-label="Primary"] a[aria-current="page"] {
   color: var(--text);
   background: var(--surface-2);
 }
 nav[aria-label="Primary"] {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  z-index: 1001;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
+  box-shadow: none;
 }
 
 /* Secondary nav */
 nav[aria-label="Experience"],
-nav[aria-label="Writing"] {
+nav[aria-label="Writing"],
+nav[data-secondary-nav] {
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
-  position: sticky;
+  position: fixed;
   top: var(--nav-height);
-  z-index: 9;
+  left: 0;
+  right: 0;
+  z-index: 999;
   background: var(--bg);
+  box-shadow: var(--elevation-2);
+}
+
+/* Smooth scroll for in-page anchors */
+html {
+  scroll-behavior: smooth;
 }
 
 nav[aria-label="Experience"] ul,
-nav[aria-label="Writing"] ul {
+nav[aria-label="Writing"] ul,
+nav[data-secondary-nav] ul {
   list-style: none;
   padding: 0;
   margin: var(--space-3) 0 0;
@@ -143,8 +174,33 @@ nav[aria-label="Writing"] ul {
   gap: var(--space-2);
 }
 
+/* When a secondary nav is present and fixed, add top padding so
+   content doesn't sit under the nav. This uses a body class set by
+   JS so it degrades gracefully without relying on :has(). */
+body.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height));
+}
+
+/* When the primary nav is fixed, add its height to top padding */
+body.has-primary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height));
+}
+
+/* When both primary and secondary are fixed, stack their heights */
+body.has-primary-nav.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + (var(--nav-height) * 2));
+}
+
 nav[aria-label="Experience"] a,
 nav[aria-label="Writing"] a {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
+}
+
+/* Generic secondary-nav anchor styles (applies to Home via data-secondary-nav) */
+nav[data-secondary-nav] a {
   display: inline-flex;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-2);
@@ -158,8 +214,19 @@ nav[aria-label="Writing"] a:hover {
   background: var(--surface);
 }
 
+nav[data-secondary-nav] a:hover {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+}
+
 nav[aria-label="Experience"] a[aria-current="page"],
 nav[aria-label="Writing"] a[aria-current="page"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+nav[data-secondary-nav] a[aria-current="page"] {
   color: var(--text);
   background: var(--surface-2);
 }
@@ -168,7 +235,7 @@ nav[aria-label="Writing"] a[aria-current="page"] {
 h1,
 h2,
 h3 {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-2);
   letter-spacing: var(--tracking-tight);
 }
 
@@ -178,7 +245,12 @@ h1 {
 
 h2 {
   font: var(--font-h2);
-  margin-top: var(--space-8);
+  margin-top: var(--space-2);
+}
+
+/* Specific spacing for the credibility section title */
+#credibility-title {
+  margin: 0 0 var(--space-);
 }
 
 p {
@@ -201,6 +273,7 @@ header[aria-labelledby="hero-title"] {
 header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
   grid-column: 1;
   grid-row: 1 / span 4; /* spans title + paragraphs */
+  margin-bottom: var(--space-4);
 }
 
 /* Put all other hero content in the right column */
@@ -226,6 +299,7 @@ header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] img {
   header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
     grid-column: 1;
     grid-row: auto;
+    margin-bottom: var(--space-4);
   }
 
   header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
@@ -251,7 +325,8 @@ footer[aria-label="Site footer"] {
   height: var(--footer-height);
   z-index: 20;
   background: var(--bg);
-  border-top: 1px solid var(--border);
+  border-top: 0px solid var(--border);
+  box-shadow: var(--footer-elevation);
 }
 
 footer[aria-label="Site footer"] .footer-inner {

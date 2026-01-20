@@ -8,6 +8,10 @@
     <!-- Styles (tokens are authoritative) -->
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+    <script src="/assets/js/secondaryNavActive.js" defer></script>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
   </head>
 
   <body>
@@ -15,7 +19,7 @@
     <nav aria-label="Primary">
       <div class="nav-inner">
         <a class="nav-logo" href="/" aria-label="Home">
-          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+          <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
         </a>
         <ul>
           <li><a href="/" aria-current="page">Home</a></li>
@@ -25,7 +29,17 @@
       </div>
     </nav>
 
+    <!-- Secondary nav (Home anchors) -->
+    <nav aria-label="Home" data-secondary-nav>
+      <ul>
+        <li><a href="#about-top">About</a></li>
+        <li><a href="#services-title">Services</a></li>
+        <li><a href="#CONTACT">Contact</a></li>
+      </ul>
+    </nav>
+
     <main role="main">
+      <div id="about-top" aria-hidden="true"></div>
       <!-- HERO -->
       <header aria-labelledby="hero-title">
         <h1 id="hero-title">My name is Pej</h1>
@@ -110,7 +124,7 @@
 
       <!-- SERVICES (embedded on Home) -->
       <section aria-labelledby="services-title">
-        <h2 id="services-title">SServices / Consultation</h2>
+        <h2 id="services-title">Services / Consultation</h2>
         <p>Working with teams and individuals</p>
       </section>
       <!-- Intro -->
@@ -196,8 +210,6 @@
         </p>
       </section>
       <section aria-labelledby="contact-title">
-        <h2 id="contact-title">Contact</h2>
-
         <form action="#" method="post">
           <div>
             <label for="contact-name">Name</label><br />
@@ -242,7 +254,7 @@
       <div class="footer-inner">
         <div class="footer-links" aria-label="Social links">
           <a href="mailto:pejmon00@gmail.com" aria-label="Email">
-            <img src="/assets/icons/email.svg" alt="" />
+            <img src="/assets/icons/SendFill.svg" alt="" />
           </a>
           <a
             href="https://www.linkedin.com/in/YOUR_HANDLE"
@@ -250,11 +262,8 @@
           >
             <img src="/assets/icons/linkedin.svg" alt="" />
           </a>
-          <a href="https://github.com/YOUR_HANDLE" aria-label="GitHub">
-            <img src="/assets/icons/github.svg" alt="" />
-          </a>
         </div>
-        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+        <div class="footer-copy">© 2026 - 2027 pej.me All Rights Reserved</div>
       </div>
     </footer>
   </body>

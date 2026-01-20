@@ -81,6 +81,27 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const os = require("os");
+
+function getLanIp() {
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === "IPv4" && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return null;
+}
+
+// listen on all interfaces so other devices on the LAN can reach the server
+server.listen(PORT, "0.0.0.0", () => {
+  const lan = getLanIp();
+  const localhost = `http://localhost:${PORT}`;
+  if (lan) {
+    console.log(`Server running on ${localhost} and http://${lan}:${PORT}`);
+  } else {
+    console.log(`Server running on ${localhost} (LAN address unavailable)`);
+  }
 });

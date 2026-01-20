@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
   </head>
 
   <body>
@@ -14,7 +16,7 @@
     <nav aria-label="Primary">
       <div class="nav-inner">
         <a class="nav-logo" href="/" aria-label="Home">
-          <img src="/assets/images/My-headshot.jpg" alt="Pej Vosooghi" />
+          <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
         </a>
         <ul>
           <li><a href="/">Home</a></li>
@@ -25,7 +27,7 @@
     </nav>
 
     <!-- Secondary Navigation: Writing (siblings-only) -->
-    <nav aria-label="Writing">
+    <nav aria-label="Writing" data-secondary-nav>
       <ul>
         <li><a href="/writing">Overview</a></li>
         <li><a href="/writing/article-1" aria-current="page">Article 01</a></li>
@@ -46,6 +48,12 @@
       <!-- Governed Hero Image Slot -->
       <section aria-label="Hero image">
         <!-- Image slot: leave empty until assets are placed -->
+        <div aria-label="Hero image">
+          <img
+            src="/assets/images/_Hero_Image_3.png"
+            alt="Portrait of Pej Vosooghi"
+          />
+        </div>
       </section>
 
       <!-- Context -->
@@ -87,7 +95,7 @@
       <div class="footer-inner">
         <div class="footer-links" aria-label="Social links">
           <a href="mailto:pejmon00@gmail.com" aria-label="Email">
-            <img src="/assets/icons/email.svg" alt="" />
+            <img src="/assets/icons/SendFill.svg" alt="" />
           </a>
           <a
             href="https://www.linkedin.com/in/YOUR_HANDLE"
@@ -95,11 +103,8 @@
           >
             <img src="/assets/icons/linkedin.svg" alt="" />
           </a>
-          <a href="https://github.com/YOUR_HANDLE" aria-label="GitHub">
-            <img src="/assets/icons/github.svg" alt="" />
-          </a>
         </div>
-        <div class="footer-copy">© 2026 Pej Vosooghi</div>
+        <div class="footer-copy">© 2026 - 2027 pej.me All Rights Reserved</div>
       </div>
     </footer>
   </body>
