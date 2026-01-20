@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
   </head>
 
   <body>
@@ -25,7 +27,7 @@
     </nav>
 
     <!-- Secondary Navigation: Articles (siblings-only) -->
-    <nav aria-label="Articles">
+    <nav aria-label="Articles" data-secondary-nav>
       <ul>
         <li><a href="/articles">Overview</a></li>
         <li><a href="/articles/article-1">Article 01</a></li>
@@ -46,7 +48,9 @@
 
       <!-- Governed Hero Image Slot -->
       <section aria-label="Hero image">
-        <!-- Image slot: leave empty until assets are placed -->
+        <div aria-label="Hero image">
+          <img src="/assets/images/_Hero_Image_4.png" alt="Article hero image" />
+        </div>
       </section>
 
       <!-- Context -->
@@ -64,30 +68,35 @@
           learning how to belong in a culture that felt foreign and, in some
           ways, indifferent. My classmates worried about things I couldn’t
           relate to—what to wear, what to watch on TV. For me, life had always
-          been about survival, not trivial choices. At first, I thought I was
-          the one who had to adapt completely, to mold myself into this new
-          world. And I did—I learned the language, excelled in school, and built
-          a life filled with success. But as I grew older, I started to see the
-          limitations of the world around me. It wasn’t just cultural
-          differences or the pain of being misunderstood. It was something
-          deeper: a lack of self-reflection in the people and systems I
-          encountered. The Missing Depth in Today’s Society The U.S. has always
-          prided itself on being a melting pot, a place where people from all
-          over the world can contribute to a collective culture. And yet, the
-          way the country approaches education, community, and even mental
-          health often lacks the depth required to truly understand those
-          contributions. Take education, for example. Schools here teach basic
-          facts about history and culture, but they rarely go beyond
-          surface-level lessons. Students might learn that Persia, now Iran, was
-          the birthplace of one of the world’s greatest empires, but they don’t
-          learn about the profound contributions that Iranian culture has made
-          to humanity. They don’t learn that Iranians developed some of the
-          first systems of governance, pioneered fields like mathematics and
+          been about survival, not trivial choices.
+        </p>
+
+        <p>
+          At first, I thought I was the one who had to adapt completely, to mold
+          myself into this new world. And I did—I learned the language, excelled
+          in school, and built a life filled with success. But as I grew older,
+          I started to see the limitations of the world around me. It wasn’t
+          just cultural differences or the pain of being misunderstood. It was
+          something deeper: a lack of self-reflection in the people and systems
+          I encountered. The Missing Depth in Today’s Society.
+        </p>
+        <p>
+          The U.S. has always prided itself on being a melting pot, a place
+          where people from all over the world can contribute to a collective
+          culture. And yet, the way the country approaches education, community,
+          and even mental health often lacks the depth required to truly
+          understand those contributions. <p>Take education, for example. Schools
+          here teach basic facts about history and culture, but they rarely go
+          beyond surface-level lessons. Students might learn that Persia, now
+          Iran, was the birthplace of one of the world’s greatest empires, but
+          they don’t learn about the profound contributions that Iranian culture
+          has made to humanity. They don’t learn that Iranians developed some of
+          the first systems of governance, pioneered fields like mathematics and
           medicine, and contributed timeless works of art and literature.
-          Iranian history is a testament to cultural intelligence—an ability to
-          think critically, innovate, and adapt that has been passed down
-          through generations. These are the qualities migrants bring with them,
-          often unrecognized and undervalued.
+          <p>Iranian history is a testament to cultural intelligence—an ability 
+            to think critically, innovate, and adapt that has been passed down 
+            through generations. These are the qualities migrants bring with them, 
+            often unrecognized and undervalued.</p>
         </p>
       </section>
 
@@ -102,40 +111,6 @@
           often, I’ve seen people rely on quick judgments and labels, reducing
           the complexity of a person’s identity to something that needs to be
           “fixed” or dismissed.
-        </p>
-      </section>
-
-      <!-- Approach -->
-      <section aria-labelledby="approach">
-        <h2 id="approach">What Migrants Bring</h2>
-        <p>
-          As migrants, we bring more than just our stories of survival. We bring
-          perspectives shaped by histories that go back thousands of years, by
-          cultures that have endured and innovated in the face of adversity. We
-          bring resilience, adaptability, and a deep understanding of the
-          world’s complexities.
-        </p>
-      </section>
-
-      <!-- Context -->
-      <section aria-labelledby="context">
-        <h2 id="context">A Call for Change</h2>
-        <p>
-          Life is too short to dismiss what we don’t understand. The
-          contributions of migrants are a reminder of the richness and
-          complexity of the human experience. If we can embrace that complexity,
-          we might just build a society that’s stronger, more compassionate, and
-          more connected than ever before..
-        </p>
-
-        <p>
-          <a
-            href="https://medium.com/@pejmon00/the-weight-of-two-worlds-a2bc74e34f84"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read the full article on Medium
-          </a>
         </p>
       </section>
     </main>

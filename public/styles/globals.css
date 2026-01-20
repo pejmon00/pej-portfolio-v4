@@ -178,17 +178,17 @@ nav[data-secondary-nav] ul {
    content doesn't sit under the nav. This uses a body class set by
    JS so it degrades gracefully without relying on :has(). */
 body.has-secondary-nav main {
-  padding-top: calc(var(--space-6) + var(--nav-height));
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
 }
 
 /* When the primary nav is fixed, add its height to top padding */
 body.has-primary-nav main {
-  padding-top: calc(var(--space-6) + var(--nav-height));
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
 }
 
 /* When both primary and secondary are fixed, stack their heights */
 body.has-primary-nav.has-secondary-nav main {
-  padding-top: calc(var(--space-6) + (var(--nav-height) * 2));
+  padding-top: calc(var(--space-6) + (var(--nav-height) * 2) + var(--space-4));
 }
 
 nav[aria-label="Experience"] a,
@@ -248,6 +248,16 @@ h2 {
   margin-top: var(--space-2);
 }
 
+/* h4 spacing: use token to keep guard happy */
+h4 {
+  margin: 0 0 var(--space-xs);
+}
+
+/* Ensure in-page anchors aren't hidden behind fixed navs */
+#services-title {
+  scroll-margin-top: calc((var(--nav-height) * 3) + var(--space-1));
+}
+
 /* Specific spacing for the credibility section title */
 #credibility-title {
   margin: 0 0 var(--space-);
@@ -304,6 +314,30 @@ header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] img {
 
   header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
     grid-column: 1;
+  }
+}
+
+/* Hero section: keep images at natural aspect ratio; videos fill width */
+section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] img,
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
   }
 }
 

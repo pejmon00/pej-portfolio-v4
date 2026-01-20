@@ -47,6 +47,8 @@
   --space-6: calc(var(--space-4) + var(--space-2)); /* 64 */
   --space-8: calc(var(--space-4) * 2); /* 96 */
   --space-10: calc(var(--space-4) * 2 + var(--space-2)); /* 112 */
+  /* small spacer (12px) used for tight vertical rhythm */
+  --space-xs: 12px;
 
   /* typography semantics */
   --font-body: 400 var(--font-size-base) / var(--line-height-base)

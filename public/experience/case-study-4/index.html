@@ -22,7 +22,7 @@
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="/experience" aria-current="page">Experience</a></li>
-          <li><a href="/writing">Writing</a></li>
+          <li><a href="/articles">Articles</a></li>
         </ul>
       </div>
     </nav>
@@ -45,13 +45,29 @@
     <!-- Long-Form Template (shared across all case studies + articles) -->
     <main role="main">
       <header>
-        <h1>Case Study 04</h1>
-        <p>Mobility AI</p>
+        <h1>Mobility AI</h1>
+        <p>Case Study 04</p>
       </header>
 
       <!-- Governed Hero Image Slot -->
       <section aria-label="Hero image">
-        <!-- Image slot: leave empty until assets are placed -->
+        <!-- Video added for testing; remove block to revert -->
+        <div aria-label="Hero image">
+          <video
+            autoplay
+            muted
+            loop
+            playsinline
+            poster="/assets/images/_Hero_Image_4.png"
+          >
+            <source src="/assets/videos/orb-480.mp4" type="video/mp4" />
+            <!-- Fallback image for browsers that don't support the video -->
+            <img
+              src="/assets/images/_Hero_Image_4.png"
+              alt="Mobility AI hero"
+            />
+          </video>
+        </div>
       </section>
 
       <!-- Context -->
