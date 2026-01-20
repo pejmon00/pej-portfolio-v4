@@ -141,21 +141,21 @@ nav[aria-label="Primary"] {
   box-shadow: none;
 }
 
-/* Secondary nav */
+/* Secondary nav: full-bleed container that keeps its inner list constrained
+  to the content width. The nav itself spans edge-to-edge so background and
+  elevation read across the viewport while the links remain centered. */
 nav[aria-label="Experience"],
 nav[aria-label="Writing"],
 nav[data-secondary-nav] {
-  width: 100%;
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: var(--space-2) var(--space-4);
   position: fixed;
   top: var(--nav-height);
   left: 0;
   right: 0;
+  width: 100%;
   z-index: 999;
   background: var(--bg);
   box-shadow: var(--elevation-2);
+  padding-bottom: var(--space-2);
 }
 
 /* Smooth scroll for in-page anchors */
@@ -167,11 +167,13 @@ nav[aria-label="Experience"] ul,
 nav[aria-label="Writing"] ul,
 nav[data-secondary-nav] ul {
   list-style: none;
-  padding: 0;
-  margin: var(--space-3) 0 0;
+  padding: 0 var(--space-4);
+  margin: var(--space-3) auto 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  max-width: var(--content-max);
+  box-sizing: border-box; /* ensure padding is included in width */
 }
 
 /* When a secondary nav is present and fixed, add top padding so
@@ -188,6 +190,19 @@ body.has-primary-nav main {
 
 /* When both primary and secondary are fixed, stack their heights */
 body.has-primary-nav.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + (var(--nav-height) * 2) + var(--space-4));
+}
+
+/* Also support html-level classes set early to prevent layout shift on load */
+html.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+html.has-primary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+html.has-primary-nav.has-secondary-nav main {
   padding-top: calc(var(--space-6) + (var(--nav-height) * 2) + var(--space-4));
 }
 
@@ -227,8 +242,8 @@ nav[aria-label="Writing"] a[aria-current="page"] {
 }
 
 nav[data-secondary-nav] a[aria-current="page"] {
-  color: var(--text);
-  background: var(--surface-2);
+  color: #ffffff;
+  background: #dc3d3d;
 }
 
 /* Type rhythm */
@@ -318,6 +333,11 @@ header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] img {
 }
 
 /* Hero section: keep images at natural aspect ratio; videos fill width */
+section[aria-label="Hero image"] > div[aria-label="Hero image"] {
+  height: var(--hero-height-md);
+  overflow: hidden;
+}
+
 section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
   width: 100%;
   height: auto;
@@ -326,18 +346,28 @@ section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
 
 section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
   width: 100%;
-  height: auto;
+  height: 100%;
   max-width: 100%;
   object-fit: cover;
   display: block;
 }
 
 @media (max-width: 640px) {
-  section[aria-label="Hero image"] > div[aria-label="Hero image"] img,
-  section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] {
+    height: var(--hero-height-sm);
+  }
+
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
     width: 100%;
     height: auto;
     border-radius: 0;
+  }
+
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
   }
 }
 
@@ -450,9 +480,54 @@ button:hover {
   background: var(--surface);
 }
 
+/* Primary form submit styling: use the red brand color and add extra
+   space above the button to separate it from the field above. */
+form button[type="submit"] {
+  background: #dc3d3d;
+  color: #ffffff;
+  border-color: #dc3d3d;
+  margin-top: var(--space-3);
+}
+
+form button[type="submit"]:hover {
+  background: #c63232;
+}
+
+/* Contact form spacing: give consistent vertical rhythm between fields */
+section[aria-labelledby="contact-title"] form > div {
+  margin-bottom: var(--space-4);
+}
+
+section[aria-labelledby="contact-title"] form button[type="submit"] {
+  margin-top: var(--space-4);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {
     scroll-behavior: auto;
   }
+}
+
+/* Strong override: ensure secondary nav remains fixed even if other
+   rules or page-level styles interfere. Uses high specificity and
+   !important to recover expected behaviour. */
+html.has-secondary-nav nav[data-secondary-nav],
+body.has-secondary-nav nav[data-secondary-nav],
+nav[data-secondary-nav] {
+  position: fixed !important;
+  top: var(--nav-height) !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1100 !important;
+}
+
+/* Ensure background and shadow are visible (stronger than the default
+   tokens) to guard against color/token overrides elsewhere). */
+html.has-secondary-nav nav[data-secondary-nav],
+body.has-secondary-nav nav[data-secondary-nav],
+nav[data-secondary-nav] {
+  background: var(--bg) !important;
+  box-shadow: 0 10px 40px rgba(2, 6, 23, 0.72) !important;
+  padding-bottom: var(--space-2) !important;
 }
