@@ -61,6 +61,9 @@
   /* hero image */
   --avatar-size: 220px;
   --radius-round: 9999px;
+  /* hero box heights (desktop / mobile) */
+  --hero-height-md: 240px;
+  --hero-height-sm: 320px;
   /* elevation / shadows */
   --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.06);
   --elevation-2: 0 6px 18px rgba(0, 0, 0, 0.12);

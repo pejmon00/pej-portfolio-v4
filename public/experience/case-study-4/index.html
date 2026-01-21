@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function () {
+        var p = location.pathname;
+        document.documentElement.classList.add("has-primary-nav");
+        if (/^\/(experience|articles|writing)(\/|$)/.test(p))
+          document.documentElement.classList.add("has-secondary-nav");
+      })();
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Case Study 04 — Portfolio</title>
@@ -12,7 +20,7 @@
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
   </head>
 
-  <body>
+  <body class="has-primary-nav has-secondary-nav">
     <!-- Primary Navigation (FINAL IA) -->
     <nav aria-label="Primary">
       <div class="nav-inner">
@@ -58,14 +66,14 @@
             muted
             loop
             playsinline
+            preload="auto"
             poster="/assets/images/_Hero_Image_4.png"
+            style="
+              background: url(&quot;/assets/images/_Hero_Image_4.png&quot;)
+                center/cover no-repeat;
+            "
           >
             <source src="/assets/videos/orb-480.mp4" type="video/mp4" />
-            <!-- Fallback image for browsers that don't support the video -->
-            <img
-              src="/assets/images/_Hero_Image_4.png"
-              alt="Mobility AI hero"
-            />
           </video>
         </div>
       </section>
@@ -143,5 +151,34 @@
         <div class="footer-copy">© 2026 - 2027 pej.me All Rights Reserved</div>
       </div>
     </footer>
+    <script>
+      (function () {
+        var v = document.querySelector(
+          'section[aria-label="Hero image"] video',
+        );
+        if (!v) return;
+        // prevent poster/background flash by removing them until video is playing
+        v.style.opacity = "0";
+        v.style.transition = "opacity 320ms ease";
+        // Remove the poster and background immediately so they don't flash
+        try {
+          v.removeAttribute("poster");
+        } catch (e) {}
+        try {
+          v.style.background = "none";
+        } catch (e) {}
+
+        function show() {
+          v.style.opacity = "1";
+          v.removeEventListener("playing", show);
+        }
+
+        v.addEventListener("playing", show, { once: true });
+        // ensure the browser starts loading the media
+        try {
+          v.load();
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

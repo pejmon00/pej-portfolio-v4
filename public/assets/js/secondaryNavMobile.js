@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var MOBILE_QUERY = "(max-width: 640px)";
+  var MOBILE_QUERY = "(max-width: 812px)";
 
   function createToggleButton(id) {
     var btn = document.createElement("button");

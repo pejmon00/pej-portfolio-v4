@@ -8,7 +8,7 @@
 }
 
 /* When JS is present and on mobile, show the toggle and enable collapse behavior */
-@media (max-width: 640px) {
+@media (max-width: 812px) {
   html.js-secnav nav[data-secondary-nav] {
     display: block;
   }
