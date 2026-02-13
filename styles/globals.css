@@ -1,0 +1,720 @@
+:root {
+  color-scheme: light dark;
+  --action-red: #dc3d3d;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--font-body);
+}
+
+/* --- Cursor light trail --- */
+.cursor-trail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.03) 70%,
+    transparent 100%
+  );
+  transform: translate(-50%, -50%);
+  transition: opacity 0.5s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-trail { display: none; }
+}
+
+@media (hover: none) {
+  .cursor-trail { display: none; }
+}
+
+main {
+  flex: 1;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Page shell */
+main {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+}
+
+/* Ensure all content sections stay within content-max width */
+main section {
+  max-width: 100%;
+}
+
+/* Primary nav */
+nav[aria-label="Primary"] {
+  width: 100%;
+  border-bottom: none;
+}
+
+nav[aria-label="Primary"] .nav-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+nav[aria-label="Primary"] .nav-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+nav[aria-label="Primary"] .nav-logo img {
+  display: block;
+  /* Use the governed logo token to ensure consistent, exact sizing */
+  height: var(--logo-h);
+  max-height: var(--logo-h);
+  width: auto;
+  object-fit: contain;
+  border-radius: 0; /* avoid accidental clipping on logo SVGs */
+}
+
+/* Prevent any background-image from repeating if a background is used */
+nav[aria-label="Primary"] .nav-logo {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+
+nav[aria-label="Primary"] ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+nav[aria-label="Primary"] a {
+  color: var(--text-muted);
+  border-radius: var(--radius-2);
+  padding: var(--space-1) var(--space-2);
+}
+
+nav[aria-label="Primary"] a:hover {
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+}
+
+/* Keep the logo visually stable on hover/focus (no background or color shift) */
+nav[aria-label="Primary"] .nav-logo:hover,
+nav[aria-label="Primary"] .nav-logo:focus {
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+nav[aria-label="Primary"] a[aria-current="page"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+nav[aria-label="Primary"] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  background: var(--bg);
+  border-bottom: none;
+  box-shadow: none;
+}
+
+/* Secondary nav: full-bleed container that keeps its inner list constrained
+  to the content width. The nav itself spans edge-to-edge so background and
+  elevation read across the viewport while the links remain centered. */
+nav[aria-label="Experience"],
+nav[aria-label="Writing"],
+nav[data-secondary-nav] {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 999;
+  background: var(--bg);
+  box-shadow: var(--elevation-2);
+  padding-bottom: var(--space-2);
+}
+
+/* Smooth scroll for in-page anchors */
+html {
+  scroll-behavior: smooth;
+}
+
+nav[aria-label="Experience"] ul,
+nav[aria-label="Writing"] ul,
+nav[data-secondary-nav] ul {
+  list-style: none;
+  padding: 0 var(--space-4);
+  margin: var(--space-3) auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: var(--content-max);
+  box-sizing: border-box; /* ensure padding is included in width */
+}
+
+/* When a secondary nav is present and fixed, add top padding so
+   content doesn't sit under the nav. This uses a body class set by
+   JS so it degrades gracefully without relying on :has(). */
+body.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+/* When the primary nav is fixed, add its height to top padding */
+body.has-primary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+/* When both primary and secondary are fixed, stack their heights */
+body.has-primary-nav.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + (var(--nav-height) * 2) + var(--space-4));
+}
+
+/* Also support html-level classes set early to prevent layout shift on load */
+html.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+html.has-primary-nav main {
+  padding-top: calc(var(--space-6) + var(--nav-height) + var(--space-2));
+}
+
+html.has-primary-nav.has-secondary-nav main {
+  padding-top: calc(var(--space-6) + (var(--nav-height) * 2) + var(--space-4));
+}
+
+nav[aria-label="Experience"] a,
+nav[aria-label="Writing"] a {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
+}
+
+/* Generic secondary-nav anchor styles (applies to Home via data-secondary-nav) */
+nav[data-secondary-nav] a {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
+}
+
+nav[aria-label="Experience"] a:hover,
+nav[aria-label="Writing"] a:hover {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+nav[data-secondary-nav] a:hover {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+nav[aria-label="Experience"] a[aria-current="page"],
+nav[aria-label="Writing"] a[aria-current="page"] {
+  color: #ffffff;
+  background: var(--action-red);
+}
+
+nav[data-secondary-nav] a[aria-current="page"] {
+  color: #ffffff;
+  background: var(--action-red);
+}
+
+/* --- Next Case Study Navigation --- */
+.study-nav {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.study-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-2);
+  background: var(--action-red);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+
+.study-nav__link:hover {
+  opacity: 0.85;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.study-nav__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.study-nav__title {
+  font-weight: 600;
+}
+
+/* Type rhythm */
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--space-2);
+  letter-spacing: var(--tracking-tight);
+}
+
+h1 {
+  font: var(--font-display);
+}
+
+h2 {
+  font: var(--font-h2);
+  margin-top: var(--space-2);
+}
+
+/* h4 spacing: use token to keep guard happy */
+h4 {
+  margin: 0 0 var(--space-xs);
+}
+
+/* Ensure in-page anchors aren't hidden behind fixed navs */
+#about-top {
+  scroll-margin-top: calc((var(--nav-height) * 2) + var(--space-6));
+}
+
+#services-title {
+  scroll-margin-top: calc((var(--nav-height) * 3) + var(--space-1));
+}
+
+/* Specific spacing for the credibility section title */
+#credibility-title {
+  margin: 0 0 var(--space-3);
+}
+
+p {
+  margin: 0 0 var(--space-3);
+  color: var(--text-muted);
+  line-height: var(--leading);
+}
+
+/* HERO layout: image left, content right */
+header[aria-labelledby="hero-title"] {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-4);
+  row-gap: var(--space-2);
+  align-items: start;
+}
+
+/* Put the image in the left column */
+header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
+  grid-column: 1;
+  grid-row: 1 / span 4; /* spans title + paragraphs */
+  margin-bottom: var(--space-4);
+}
+
+/* Put all other hero content in the right column */
+header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
+  grid-column: 2;
+}
+
+/* Circle crop */
+header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] img {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--radius-round);
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile: stack */
+@media (max-width: 640px) {
+  header[aria-labelledby="hero-title"] {
+    grid-template-columns: 1fr;
+  }
+
+  header[aria-labelledby="hero-title"] > div[aria-label="Hero image"] {
+    grid-column: 1;
+    grid-row: auto;
+    margin-bottom: var(--space-4);
+  }
+
+  header[aria-labelledby="hero-title"] > :not(div[aria-label="Hero image"]) {
+    grid-column: 1;
+  }
+}
+
+/* Hero section: keep images at natural aspect ratio; videos fill width */
+section[aria-label="Hero image"] {
+  max-width: var(--content-max);
+  margin: 0 auto var(--space-6);
+}
+
+section[aria-label="Hero image"] > div[aria-label="Hero image"] {
+  position: relative;
+  height: var(--hero-height-md);
+  overflow: hidden;
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Single image: full width */
+section[aria-label="Hero image"] > div[aria-label="Hero image"] img:only-child {
+  width: 100%;
+  height: auto;
+  display: block;
+  flex: 1;
+}
+
+/* Multiple images: side by side with equal width */
+section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Force video to absolutely fill the hero box and crop via object-fit */
+section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  section[aria-label="Hero image"] {
+    margin-bottom: var(--space-4);
+  }
+  
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] {
+    height: var(--hero-height-sm);
+    flex-direction: column;
+  }
+
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] img {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    flex: none;
+  }
+
+  section[aria-label="Hero image"] > div[aria-label="Hero image"] video {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+  }
+}
+
+/* Logo strip */
+section[aria-labelledby="credibility-title"] > div[aria-label="Company logos"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-2) 0 var(--space-2);
+}
+
+/* Footer (fixed to viewport bottom) */
+footer[aria-label="Site footer"] {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: var(--footer-height);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+/* Add padding to main to prevent content from going behind fixed footer */
+main {
+  padding-bottom: calc(var(--footer-height) + var(--space-4));
+}
+
+footer[aria-label="Site footer"] .footer-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  min-height: var(--footer-height);
+}
+
+footer[aria-label="Site footer"] a {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer[aria-label="Site footer"] a:hover {
+  color: var(--text);
+}
+
+/* Footer left: social icons */
+footer[aria-label="Site footer"] .footer-links {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+footer[aria-label="Site footer"] .footer-links img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+footer[aria-label="Site footer"] .footer-links a:hover img {
+  opacity: 0.8;
+}
+
+footer[aria-label="Site footer"] .footer-copy {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Mobile: ensure footer adapts to browser UI changes without white space */
+@media (max-width: 640px) {
+  footer[aria-label="Site footer"] {
+    position: fixed;
+    /* Use dynamic viewport height to handle mobile browser bars */
+    bottom: 0;
+  }
+  
+  footer[aria-label="Site footer"] .footer-inner {
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    text-align: center;
+  }
+  
+  footer[aria-label="Site footer"] .footer-copy {
+    font-size: 12px;
+  }
+}
+
+section[aria-labelledby="credibility-title"] img {
+  height: var(--logo-h);
+  width: auto;
+  opacity: 0.85;
+}
+
+section[aria-labelledby="credibility-title"] img:hover {
+  opacity: 1;
+}
+
+/* Forms */
+form {
+  margin-top: var(--space-2);
+  max-width: var(--form-max);
+}
+
+label {
+  display: inline-block;
+  margin-bottom: var(--space-1);
+  color: var(--text);
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-2);
+  padding: var(--space-2);
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius-2);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--surface);
+}
+
+/* Primary form submit styling: use the red brand color and add extra
+   space above the button to separate it from the field above. */
+form button[type="submit"] {
+  background: #dc3d3d;
+  color: #ffffff;
+  border-color: #dc3d3d;
+  margin-top: var(--space-3);
+}
+
+form button[type="submit"]:hover {
+  background: #c63232;
+}
+
+/* Contact form spacing: give consistent vertical rhythm between fields */
+section[aria-labelledby="contact-title"] form > div {
+  margin-bottom: var(--space-2);
+}
+
+section[aria-labelledby="contact-title"] form button[type="submit"] {
+  margin-top: var(--space-2);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
+
+/* Strong override: ensure secondary nav remains fixed even if other
+   rules or page-level styles interfere. Uses high specificity and
+   !important to recover expected behaviour. */
+html.has-secondary-nav nav[data-secondary-nav],
+body.has-secondary-nav nav[data-secondary-nav],
+nav[data-secondary-nav] {
+  position: fixed !important;
+  top: var(--nav-height) !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1100 !important;
+}
+
+/* Ensure background and shadow are visible (stronger than the default
+   tokens) to guard against color/token overrides elsewhere). */
+html.has-secondary-nav nav[data-secondary-nav],
+body.has-secondary-nav nav[data-secondary-nav],
+nav[data-secondary-nav] {
+  background: var(--bg) !important;
+  box-shadow: 0 10px 40px rgba(2, 6, 23, 0.72) !important;
+  padding-bottom: var(--space-2) !important;
+}
+
+/* Section separator */
+.section-divider {
+  width: 50%;
+  margin: var(--space-6) auto;
+  border: 0;
+  border-top: 1px solid var(--border);
+  opacity: 0.6;
+}
+
+/* Hero-style section titles (keep semantic heading level) */
+.section-hero-title {
+  font: var(--font-display);
+  margin: 0 0 var(--space-2);
+}
+
+/* Overview page Index blocks (Articles / Experience) */
+.content-index {
+  margin-top: 0;
+  padding-top: 0;
+}
+.content-index__list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.content-index__list a {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border-radius: var(--radius-2);
+  box-sizing: border-box;
+}
+.content-index__list a:hover {
+  background: var(--surface-2);
+}
+
+/* Anchor offsets for fixed primary + secondary nav */
+html.has-primary-nav {
+  --anchor-offset: calc(var(--nav-height) + var(--space-4));
+}
+html.has-primary-nav.has-secondary-nav {
+  --anchor-offset: calc((var(--nav-height) * 2) + var(--space-4));
+}
+[id] {
+  scroll-margin-top: var(--anchor-offset);
+}

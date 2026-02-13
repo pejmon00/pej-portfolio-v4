@@ -1,0 +1,205 @@
+/* ==========================================================================
+   Gallery — project-based grid + per-project thumbnails + lightbox overlay
+   ========================================================================== */
+
+/* ---------- shared section spacing ---------- */
+.gallery-section {
+  margin-top: var(--space-4);
+}
+
+.gallery-section h2 {
+  margin-bottom: var(--space-1);
+}
+
+.gallery-section p {
+  margin-bottom: var(--space-3);
+  color: var(--text-muted);
+}
+
+/* ---------- grid of projects ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* ---------- project card ---------- */
+.gallery-project {
+  overflow: hidden;
+}
+
+.gallery-project__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-1) 0;
+  color: var(--text);
+}
+
+/* cover image */
+.gallery-project__cover {
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--radius-2);
+  transition: transform 0.2s ease;
+}
+
+.gallery-project__cover:hover {
+  transform: scale(1.02);
+}
+
+.gallery-project__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-2);
+  object-fit: cover;
+}
+
+/* ---------- per-project thumbnail strip ---------- */
+.gallery-project__thumbs {
+  display: flex;
+  gap: 6px;
+  padding: var(--space-1) 0 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.gallery-project__thumb {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-2);
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, opacity 0.2s;
+  opacity: 0.6;
+}
+
+.gallery-project__thumb:hover,
+.gallery-project__thumb:focus-visible,
+.gallery-project__thumb.active {
+  opacity: 1;
+  border-color: var(--text);
+}
+
+.gallery-project__thumb:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gallery-project__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- lightbox overlay ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.lightbox[aria-hidden="false"] {
+  display: flex;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 10;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 8px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.lightbox__close:hover { opacity: 1; }
+
+.lightbox__content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 95vw;
+  max-height: 85vh;
+}
+
+.lightbox__image-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox__img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.lightbox__btn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+.lightbox__btn:hover { background: rgba(255,255,255,0.3); }
+
+.lightbox__caption {
+  color: rgba(255,255,255,0.85);
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-align: center;
+  margin-top: 12px;
+  max-width: 80vw;
+}
+
+.lightbox__counter {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+  .lightbox__content { gap: 8px; }
+  .lightbox__btn { width: 40px; height: 40px; }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gallery-project__cover { transition: none; }
+}

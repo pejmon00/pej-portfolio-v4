@@ -1,0 +1,7 @@
+.DS_Store
+*.log
+node_modules/
+pej-portfolio-deploy.zip
+portfolio-deploy.zip
+.claude/
+CLAUDE.md

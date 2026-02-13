@@ -1,0 +1,131 @@
+[
+  {
+    "id": 1,
+    "title": "Tokenized Design System",
+    "slug": "case-study-1",
+    "subtitle": "Case Study 01",
+    "heroImage": "/assets/images/_Hero_Image_8.png",
+    "heroAlt": "Tokenized Design System hero image",
+    "sections": [
+      {
+        "id": "context",
+        "heading": "Overview",
+        "body": "<p>\n          This case study traces the evolution of my design systems\n          practice\u2014from early asset abstraction to fully tokenized\n          systems\u2014showing how foundational system thinking enabled scalability,\n          theming, and behavioral consistency across products, platforms, and\n          organizations.\n        </p>"
+      },
+      {
+        "id": "problem",
+        "heading": "Role",
+        "body": "<p>\n          Design systems lead and contributor across multiple organizations.\n          Defined system abstractions, contracts, and governance. Partnered\n          closely with engineering to align design intent with implementation.\n          Mentored designers and guided system adoption and evolution.\n        </p>"
+      },
+      {
+        "id": "approach",
+        "heading": "System / Work",
+        "body": "<p>\n          The work began at Roku, where supporting dozens of OEM partners\n          required the system to handle frequent icon swaps and theming changes\n          driven by manufacturer deals. XML-based abstraction was introduced to\n          separate assets from implementation, enabling replacement without\n          rewriting the system, though tooling limitations made theming and\n          library management difficult to maintain.\n        </p>\n        <p>\n          At Google, the emergence of Sketch enabled a tighter bridge between\n          design and engineering. Vector-based assets defined in JSON allowed\n          shared SVG libraries and live specs, reducing translation loss and\n          enabling a common source of truth.\n        </p>\n        <p>\n          At Amazon, the work matured into a robust tokenized design system,\n          particularly for automotive platforms. Tokens were structured around\n          base and semantic layers, allowing typography, color, layout, and\n          theming to adapt through rules rather than manual updates. This\n          approach enabled system-level capabilities such as restriction\n          management based on rules and conditions.\n        </p>\n        <p>\n          This work continues through mentorship and leadership at 42,\n          supporting designers and teams in applying tokenized systems thinking\n          to new platforms and use cases.\n        </p>"
+      },
+      {
+        "id": "design",
+        "heading": "Outcome",
+        "body": "<p>\n          Enabled scalable theming and OEM customization without fragmenting\n          systems. Reduced design\u2013engineering friction through shared\n          abstractions. Established token-driven rules supporting adaptive\n          layouts and behavior. Laid the foundation for higher-level systems\n          such as global UI surfaces and embedded AI.\n        </p>\n        <p>\n          With a shared design language in place, the next challenge became\n          orchestration\u2014how multiple surfaces and applications coexist without\n          conflict.\n        </p>"
+      }
+    ],
+    "navLabel": "Case Study 01",
+    "order": 1
+  },
+  {
+    "id": 2,
+    "title": "Window Management System",
+    "slug": "case-study-2",
+    "subtitle": "Case Study 02",
+    "heroImage": "/assets/images/_Hero_Image_5.png",
+    "heroAlt": "Window Management System hero image",
+    "sections": [
+      {
+        "id": "context",
+        "heading": "Overview",
+        "body": "<p>\n          As Amazon moved to build its own operating system, window management\n          became a critical layer of the stack. The challenge was enabling\n          multiple applications and system surfaces to coexist\u2014stacked,\n          side-by-side, or overlaid\u2014while remaining predictable, performant, and\n          visually coherent.\n        </p>"
+      },
+      {
+        "id": "problem",
+        "heading": "Role",
+        "body": "<p>\n          Lead designer for the window management model. Defined system-level\n          rules for layout, focus, and hierarchy. Partnered with platform and\n          application engineering teams. Established contracts enabling\n          coordination across processes.\n        </p>"
+      },
+      {
+        "id": "approach",
+        "heading": "System / Work",
+        "body": "<p>\n          The work focused on creating a governed windowing framework at a high\n          level of the OS\u2014one that could coordinate applications that did not\n          have direct visibility into each other.\n        </p>\n        <p>\n          Key aspects included directional communication between layers, z-order\n          and priority rules, support for glassmorphic background treatments,\n          and a responsive grid system enabling multiple applications to run\n          concurrently across screen configurations.\n        </p>\n        <p>\n          Because processes were isolated, the system relied on clear contracts\n          and signals rather than shared state, allowing complex layouts without\n          breaking encapsulation or performance guarantees.\n        </p>"
+      },
+      {
+        "id": "design",
+        "heading": "Outcome",
+        "body": "<p>\n          Enabled predictable multi-window experiences at the OS level. Allowed\n          advanced visual treatments without compromising stability. Made\n          concurrent applications viable through clear spatial and behavioral\n          rules. Provided a durable foundation for scalable, responsive layouts.\n        </p>\n        <p>\n          Once concurrency and spatial rules were established at the system\n          level, the focus shifted to how information could surface globally\n          without breaking application boundaries.\n        </p>"
+      }
+    ],
+    "navLabel": "Case Study 02",
+    "order": 2
+  },
+  {
+    "id": 3,
+    "title": "Widget Drawer",
+    "slug": "case-study-3",
+    "subtitle": "Case Study 03",
+    "heroImage": "/assets/images/_Hero_Image_9.png",
+    "heroAlt": "Widget Drawer hero image",
+    "sections": [
+      {
+        "id": "context",
+        "heading": "Overview",
+        "body": "<p>\n          The Widget Drawer is a persistent, modular UI framework that\n          introduced global surfaces for delivering information and actions\n          without clutter. It began with widgets on Alexa home devices and\n          evolved to extend into mobility contexts.\n        </p>"
+      },
+      {
+        "id": "problem",
+        "heading": "Role",
+        "body": "<p>\n          System designer and lead for the Widget Drawer framework. Defined\n          interaction contracts, priority rules, and governance. Partnered with\n          engineering, product management, and business development. Enabled\n          third-party adoption and monetization pathways.\n        </p>"
+      },
+      {
+        "id": "approach",
+        "heading": "System / Work",
+        "body": "<p>\n          Widgets were treated as global surfaces rather than app-bound UI,\n          sitting above applications to surface critical content without\n          fragmenting flows. The framework established clear contracts,\n          attention rules, and predictable behavior across contexts.\n        </p>\n        <p>\n          In partnership with product and business development, the system was\n          opened to third-party applications, allowing sports, finance, and\n          entertainment providers to surface timely content through\n          widgets\u2014creating a flywheel for engagement and monetization without\n          compromising system integrity.\n        </p>"
+      },
+      {
+        "id": "design",
+        "heading": "Outcome",
+        "body": "<p>\n          Established a durable platform primitive for global UI surfaces.\n          Enabled third-party participation through governed frameworks. Reduced\n          cognitive load and avoided app-level interruptions. Laid the\n          structural foundation for embedded AI.\n        </p>\n        <p>\n          With stable global surfaces in place, the next question became how\n          intelligence could participate\u2014only when appropriate\u2014without\n          overwhelming the system or the person.\n        </p>"
+      }
+    ],
+    "navLabel": "Case Study 03",
+    "order": 3
+  },
+  {
+    "id": 4,
+    "title": "Mobility AI",
+    "slug": "case-study-4",
+    "subtitle": "Case Study 04",
+    "heroImage": "",
+    "heroVideo": "/assets/videos/orb-480.mp4",
+    "heroAlt": "Mobility AI hero video",
+    "sections": [
+      {
+        "id": "context",
+        "heading": "Overview",
+        "body": "<p>\n          Mobility AI focuses on embedding intelligence directly into the\n          in-vehicle experience, allowing assistance to surface naturally\n          without breaking flow or control.\n        </p>"
+      },
+      {
+        "id": "problem",
+        "heading": "Role",
+        "body": "<p>\n          Design lead for the Mobility AI interaction model. Defined how AI\n          surfaces, escalates, and hands off information. Established rules for\n          timing, confidence, and intervention. Partnered with engineering,\n          product, and data teams.\n        </p>"
+      },
+      {
+        "id": "approach",
+        "heading": "System / Work",
+        "body": "<p>\n          The system supports two interaction models. First, AI delivers content\n          through dynamic cards and persistent widgets during high-confidence\n          moments. Second, when deeper interaction is required, AI hands off to\n          system or third-party applications to handle complex workflows.\n        </p>\n        <p>\n          AI intervention is governed by golden moments\u2014brief windows where\n          confidence is high that assistance will be useful, welcome, and\n          safe\u2014identified through environmental, system, behavioral, and intent\n          signals. Criticality levels determine how prominently AI intervenes,\n          preserving control and reversibility.\n        </p>"
+      },
+      {
+        "id": "design",
+        "heading": "Outcome",
+        "body": "<p>\n          Established a clear interaction model for embedded AI. Enabled timely\n          assistance without distraction. Created reliable handoff patterns\n          between AI and applications. Preserved trust through restraint and\n          predictability.\n        </p>"
+      }
+    ],
+    "navLabel": "Case Study 04",
+    "order": 4
+  }
+]

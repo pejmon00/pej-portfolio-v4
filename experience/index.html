@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function () {
+        var p = location.pathname;
+        document.documentElement.classList.add("has-primary-nav");
+        if (/^\/(experience|articles|writing)(\/|$)/.test(p))
+          document.documentElement.classList.add("has-secondary-nav");
+      })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Experience — Portfolio</title>
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+  </head>
+  <body>
+    <nav aria-label="Primary">
+      <div class="nav-inner">
+        <a class="nav-logo" href="/" aria-label="Home">
+          <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
+        </a>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/experience" aria-current="page">Experience</a></li>
+          <li><a href="/articles">Articles</a></li>
+          <li><a href="/gallery">Gallery</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <nav aria-label="Experience" data-secondary-nav>
+      <ul>
+        <li><a href="/experience" aria-current="page">Overview</a></li>
+        <li><a href="/experience/case-study-1">Case Study 01</a></li>
+        <li><a href="/experience/case-study-2">Case Study 02</a></li>
+        <li><a href="/experience/case-study-3">Case Study 03</a></li>
+        <li><a href="/experience/case-study-4">Case Study 04</a></li>
+
+      </ul>
+    </nav>
+
+    <main role="main">
+      <!-- HERO -->
+      <header aria-labelledby="hero-title">
+        <!-- editable:heroTitle --><h1 id="hero-title">Experience</h1><!-- /editable:heroTitle -->
+        <!-- editable:heroSubtitle --><h4>Selected systems work, case studies, and outcomes.</h4><!-- /editable:heroSubtitle -->
+        <!-- editable:heroText --><p>These case studies reflect work on systems that operate across
+          products, platforms, and organizations.</p><!-- /editable:heroText -->
+        <div aria-label="Hero image">
+          <img src="/assets/images/_Hero_Image_1.png" alt="Hero image" />
+        </div>
+      </header>
+
+      <section aria-labelledby="overview-title">
+        <h1 id="overview-title">Overview</h1>
+        <!-- editable:overviewBody --><p>The focus is not on individual features, but on system-level
+          structure—how multiple surfaces coexist, how behavior remains
+          predictable at scale, and how decisions hold up over time. Each case
+          examines a different layer of that problem, from foundational
+          abstractions to global UI surfaces and embedded intelligence.</p><!-- /editable:overviewBody -->
+      </section>
+
+      <section class="content-index" aria-labelledby="experience-index-title">
+        <hr class="section-divider" aria-hidden="true" />
+        <h2 id="experience-index-title" class="section-hero-title">Case Study Index</h2>
+        <ul class="content-index__list">
+          <li><a href="/experience/case-study-1/">Tokenized Design System</a></li>
+          <li><a href="/experience/case-study-2/">Window Management System</a></li>
+          <li><a href="/experience/case-study-3/">Widget Drawer</a></li>
+          <li><a href="/experience/case-study-4/">Mobility AI</a></li>
+
+        </ul>
+      </section>
+    </main>
+
+    <!-- Footer Include -->
+    <div id="footer-placeholder">
+      <!-- Fallback: inline footer for graceful degradation -->
+      <footer aria-label="Site footer">
+        <div class="footer-inner">
+          <!-- Email + Social Icons (left) -->
+          <div class="footer-links" aria-label="Contact links">
+            <a href="mailto:pejmon00@gmail.com" aria-label="Email">
+              <img src="/assets/icons/SendFill.svg" alt="" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/pejvosooghi/"
+              aria-label="LinkedIn"
+            >
+              <img src="/assets/icons/Linkedin.svg" alt="" />
+            </a>
+          </div>
+
+          <!-- Copyright (right) -->
+          <div class="footer-copy">&copy; 2026 - 2027 pej.me All Rights Reserved</div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Client-side includes script -->
+    <script src="/_includes.js" defer></script>
+  </body>
+</html>

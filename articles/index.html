@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function () {
+        var p = location.pathname;
+        document.documentElement.classList.add("has-primary-nav");
+        if (/^\/(experience|articles|writing)(\/|$)/.test(p))
+          document.documentElement.classList.add("has-secondary-nav");
+      })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Articles — Portfolio</title>
+
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+  </head>
+  <body>
+    <!-- Header Include -->
+    <div id="header-placeholder">
+      <!-- Fallback: inline header for graceful degradation -->
+      <nav aria-label="Primary">
+        <div class="nav-inner">
+          <a class="nav-logo" href="/" aria-label="Home">
+            <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
+          </a>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/experience">Experience</a></li>
+            <li><a href="/articles">Articles</a></li>
+            <li><a href="/gallery">Gallery</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Secondary Navigation: Articles (siblings-only) -->
+    <nav aria-label="Articles" data-secondary-nav>
+      <ul>
+        <li><a href="/articles" aria-current="page">Overview</a></li>
+        <li><a href="/articles/article-1">Article 01</a></li>
+        <li><a href="/articles/article-2">Article 02</a></li>
+
+      </ul>
+    </nav>
+
+    <!-- Page Content -->
+    <main role="main">
+      <!-- HERO -->
+      <header aria-labelledby="hero-title">
+        <!-- editable:heroTitle --><h1 id="hero-title">Articles</h1><!-- /editable:heroTitle -->
+        <!-- editable:heroSubtitle --><h4>Personal reflections</h4><!-- /editable:heroSubtitle -->
+        <!-- editable:heroText --><p>These articles are published essays written outside the context of
+          client work. They come from the same place as my design thinking, but move at a different pace.</p><!-- /editable:heroText -->
+        <div aria-label="Hero image">
+          <img src="/assets/images/_Hero_Image_2.png" alt="Hero image" />
+        </div>
+      </header>
+
+      <section aria-labelledby="overview-title">
+        <h1 id="overview-title">Overview</h1>
+        <!-- editable:overviewBody --><p>I&#039;m drawn to writing traditions that approach meaning
+          differently—Persian philosophy, Irish poetry, and both Western and
+          Eastern ways of shaping thought through language. Some writing leans
+          into metaphor and patience, letting meaning unfold. Other traditions
+          favor structure, clarity, and consequence. What holds my attention lives
+          between those approaches—where feeling and discipline coexist, and where
+          language is used to reveal rather than persuade. Each piece here stands
+          on its own and is presented as originally published.</p><!-- /editable:overviewBody -->
+      </section>
+
+      <section class="content-index" aria-labelledby="articles-index-title">
+        <hr class="section-divider" aria-hidden="true" />
+        <h2 id="articles-index-title" class="section-hero-title">Article Index</h2>
+        <ul class="content-index__list">
+          <li><a href="/articles/article-1/">Silicon Valley’s Fragile Harmony: A Reflection on Diversity in a Divided World</a></li>
+          <li><a href="/articles/article-2/">The Weight of Two Worlds: What Migrants Bring and What the World Needs</a></li>
+
+        </ul>
+      </section>
+    </main>
+
+    <!-- Footer Include -->
+    <div id="footer-placeholder">
+      <!-- Fallback: inline footer for graceful degradation -->
+      <footer aria-label="Site footer">
+        <div class="footer-inner">
+          <!-- Email + Social Icons (left) -->
+          <div class="footer-links" aria-label="Contact links">
+            <a href="mailto:pejmon00@gmail.com" aria-label="Email">
+              <img src="/assets/icons/SendFill.svg" alt="" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/pejvosooghi/"
+              aria-label="LinkedIn"
+            >
+              <img src="/assets/icons/Linkedin.svg" alt="" />
+            </a>
+          </div>
+
+          <!-- Copyright (right) -->
+          <div class="footer-copy">&copy; 2026 - 2027 pej.me All Rights Reserved</div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Client-side includes script -->
+    <script src="/_includes.js" defer></script>
+  </body>
+</html>

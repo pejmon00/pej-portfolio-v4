@@ -1,0 +1,135 @@
+[
+    {
+        "id": 1,
+        "title": "Amazon",
+        "images": [
+            {
+                "src": "/assets/images/uploads/AMZ-Automotive-0-1770935757.png",
+                "alt": "AMZ Automotive 0 1770935757",
+                "description": "Alexa Team"
+            },
+            {
+                "src": "/assets/images/uploads/AMZ-Automotive-1-1770935757.png",
+                "alt": "AMZ Automotive 1 1770935757",
+                "description": "Alexa Mobility "
+            },
+            {
+                "src": "/assets/images/uploads/AMZ-Automotive-2-1770935757.png",
+                "alt": "AMZ Automotive 2 1770935757",
+                "description": "Multi Modal Interactions"
+            },
+            {
+                "src": "/assets/images/uploads/AMZ-Automotive-3-1770935757.png",
+                "alt": "AMZ Automotive 3 1770935757",
+                "description": "System Design"
+            },
+            {
+                "src": "/assets/images/uploads/AMZ-Automotive-4-1770935757.png",
+                "alt": "AMZ Automotive 4 1770935757",
+                "description": "Design System "
+            },
+            {
+                "src": "/assets/images/uploads/image-10-1770935757.png",
+                "alt": "image 10 1770935757",
+                "description": "Form Factor "
+            }
+        ],
+        "order": 1
+    },
+    {
+        "id": 2,
+        "title": "Roku",
+        "images": [
+            {
+                "src": "/assets/images/uploads/Roku-UI-Themes-Ad-DS-0-1770935757.png",
+                "alt": "Roku UI Themes Ad DS 0 1770935757",
+                "description": "Roku"
+            },
+            {
+                "src": "/assets/images/uploads/Roku-UI-Themes-Ad-DS-1-1770935757.png",
+                "alt": "Roku UI Themes Ad DS 1 1770935757",
+                "description": "The 10 Foot UI"
+            },
+            {
+                "src": "/assets/images/uploads/Roku-UI-Themes-Ad-DS-2-1770935757.png",
+                "alt": "Roku UI Themes Ad DS 2 1770935757",
+                "description": "Template Theme"
+            },
+            {
+                "src": "/assets/images/uploads/Roku-UI-Themes-Ad-DS-3-1770935757.png",
+                "alt": "Roku UI Themes Ad DS 3 1770935757",
+                "description": "UI interactions"
+            },
+            {
+                "src": "/assets/images/uploads/Roku-UI-Themes-Ad-DS-4-1770935757.png",
+                "alt": "Roku UI Themes Ad DS 4 1770935757",
+                "description": "Design System Development"
+            }
+        ],
+        "order": 1
+    },
+    {
+        "id": 3,
+        "title": "Google",
+        "images": [
+            {
+                "src": "/assets/images/uploads/Google-DSM-0-1770935757.png",
+                "alt": "Google DSM 0 1770935757",
+                "description": "Google"
+            },
+            {
+                "src": "/assets/images/uploads/Google-DSM-1-1770935757.png",
+                "alt": "Google DSM 1 1770935757",
+                "description": "CMS System Design"
+            },
+            {
+                "src": "/assets/images/uploads/Google-DSM-2-1770935757.png",
+                "alt": "Google DSM 2 1770935757",
+                "description": "Content managment"
+            },
+            {
+                "src": "/assets/images/uploads/Google-DSM-3-1770935757.png",
+                "alt": "Google DSM 3 1770935757",
+                "description": "Roles and Permissions Design"
+            },
+            {
+                "src": "/assets/images/uploads/image-1770935757.png",
+                "alt": "image 1770935757",
+                "description": "Production Design"
+            },
+            {
+                "src": "/assets/images/uploads/image-5-1770935757.png",
+                "alt": "image 5 1770935757",
+                "description": "Design System"
+            }
+        ],
+        "order": 1
+    },
+    {
+        "id": 4,
+        "title": "Product Design",
+        "images": [
+            {
+                "src": "/assets/images/uploads/prod-design-1770938943.png",
+                "alt": "prod design 1770938943",
+                "description": "Product Design"
+            },
+            {
+                "src": "/assets/images/uploads/System0-1770938741.png",
+                "alt": "System0 1770938741",
+                "description": "User Experience Design"
+            },
+            {
+                "src": "/assets/images/uploads/System1-1770938741.png",
+                "alt": "System1 1770938741",
+                "description": "Agile + Waterfall Hybrid"
+            },
+            {
+                "src": "/assets/images/uploads/System2-1770938741.png",
+                "alt": "System2 1770938741",
+                "description": "Agile"
+            }
+        ],
+        "order": 1
+    }
+]

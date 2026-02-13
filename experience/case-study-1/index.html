@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function () {
+        var p = location.pathname;
+        document.documentElement.classList.add("has-primary-nav");
+        if (/^\/(experience|articles|writing)(\/|$)/.test(p))
+          document.documentElement.classList.add("has-secondary-nav");
+      })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Case Study 01 — Portfolio</title>
+
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/globals.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+  </head>
+
+  <body>
+    <!-- Header Include -->
+    <div id="header-placeholder">
+      <!-- Fallback: inline header for graceful degradation -->
+      <nav aria-label="Primary">
+        <div class="nav-inner">
+          <a class="nav-logo" href="/" aria-label="Home">
+            <img src="/assets/icons/PEJ_PORT_LOGO.svg" alt="Pej Vosooghi" />
+          </a>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/experience">Experience</a></li>
+            <li><a href="/articles">Articles</a></li>
+            <li><a href="/gallery">Gallery</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Secondary Navigation: Experience (siblings-only) -->
+    <nav aria-label="Experience" data-secondary-nav>
+      <ul>
+        <li><a href="/experience">Overview</a></li>
+        <li><a href="/experience/case-study-1" aria-current="page">Case Study 01</a></li>
+        <li><a href="/experience/case-study-2">Case Study 02</a></li>
+        <li><a href="/experience/case-study-3">Case Study 03</a></li>
+        <li><a href="/experience/case-study-4">Case Study 04</a></li>
+
+      </ul>
+    </nav>
+
+    <!-- Long-Form Template (shared across all case studies + articles) -->
+    <main role="main">
+      <header>
+        <h1>Tokenized Design System</h1>
+        <p>Case Study 01</p>
+      </header>
+
+      <!-- Governed Hero Media Slot -->
+      <section aria-label="Hero image">
+        <div aria-label="Hero image">
+          <img src="/assets/images/_Hero_Image_8.png" alt="Tokenized Design System hero image" />
+        </div>
+      </section>
+
+      <!-- Context -->
+      <section aria-labelledby="context">
+        <h2 id="context" class="section-hero-title">Overview</h2>
+        <p>
+          This case study traces the evolution of my design systems
+          practice—from early asset abstraction to fully tokenized
+          systems—showing how foundational system thinking enabled scalability,
+          theming, and behavioral consistency across products, platforms, and
+          organizations.
+        </p>
+      </section>
+      <!-- Problem -->
+      <section aria-labelledby="problem">
+        <h2 id="problem">Role</h2>
+        <p>
+          Design systems lead and contributor across multiple organizations.
+          Defined system abstractions, contracts, and governance. Partnered
+          closely with engineering to align design intent with implementation.
+          Mentored designers and guided system adoption and evolution.
+        </p>
+      </section>
+      <!-- Approach -->
+      <section aria-labelledby="approach">
+        <h2 id="approach">System / Work</h2>
+        <p>
+          The work began at Roku, where supporting dozens of OEM partners
+          required the system to handle frequent icon swaps and theming changes
+          driven by manufacturer deals. XML-based abstraction was introduced to
+          separate assets from implementation, enabling replacement without
+          rewriting the system, though tooling limitations made theming and
+          library management difficult to maintain.
+        </p>
+        <p>
+          At Google, the emergence of Sketch enabled a tighter bridge between
+          design and engineering. Vector-based assets defined in JSON allowed
+          shared SVG libraries and live specs, reducing translation loss and
+          enabling a common source of truth.
+        </p>
+        <p>
+          At Amazon, the work matured into a robust tokenized design system,
+          particularly for automotive platforms. Tokens were structured around
+          base and semantic layers, allowing typography, color, layout, and
+          theming to adapt through rules rather than manual updates. This
+          approach enabled system-level capabilities such as restriction
+          management based on rules and conditions.
+        </p>
+        <p>
+          This work continues through mentorship and leadership at 42,
+          supporting designers and teams in applying tokenized systems thinking
+          to new platforms and use cases.
+        </p>
+      </section>
+      <!-- Design -->
+      <section aria-labelledby="design">
+        <h2 id="design">Outcome</h2>
+        <p>
+          Enabled scalable theming and OEM customization without fragmenting
+          systems. Reduced design–engineering friction through shared
+          abstractions. Established token-driven rules supporting adaptive
+          layouts and behavior. Laid the foundation for higher-level systems
+          such as global UI surfaces and embedded AI.
+        </p>
+        <p>
+          With a shared design language in place, the next challenge became
+          orchestration—how multiple surfaces and applications coexist without
+          conflict.
+        </p>
+      </section>
+
+      <nav class="study-nav" aria-label="Case study navigation">
+        <a class="study-nav__link" href="/experience/case-study-2/">
+          Next
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </nav>
+
+    </main>
+
+    <!-- Footer Include -->
+    <div id="footer-placeholder">
+      <!-- Fallback: inline footer for graceful degradation -->
+      <footer aria-label="Site footer">
+        <div class="footer-inner">
+          <!-- Email + Social Icons (left) -->
+          <div class="footer-links" aria-label="Contact links">
+            <a href="mailto:pejmon00@gmail.com" aria-label="Email">
+              <img src="/assets/icons/SendFill.svg" alt="" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/pejvosooghi/"
+              aria-label="LinkedIn"
+            >
+              <img src="/assets/icons/Linkedin.svg" alt="" />
+            </a>
+          </div>
+
+          <!-- Copyright (right) -->
+          <div class="footer-copy">&copy; 2026 - 2027 pej.me All Rights Reserved</div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Client-side includes script -->
+    <script src="/_includes.js" defer></script>
+  </body>
+</html>

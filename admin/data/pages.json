@@ -1,0 +1,33 @@
+{
+    "site": {
+        "logo": "/assets/icons/PEJ_PORT_LOGO.svg"
+    },
+    "home": {
+        "heroTitle": "My name is Pej",
+        "heroText": "I work on complex systems where clarity matters. These are systems people rely on every day—where decisions have consequences and durability matters more than novelty.",
+        "heroImage": "/assets/images/My-headshot.jpg",
+        "servicesImage": "/assets/images/uploads/Screenshot-2026-02-12-at-4-11-27---PM-1770941497.png",
+        "aboutTitle": "About",
+        "aboutBody": "<p>Welcome to my site</p>\n        <p>\n          I’ve spent much of my career working on things that have to hold up over time—under real constraints and in the hands of real people. What matters most to me is how systems behave once they’re in the wild, and whether people trust what they rely on every day.\n        </p>\n        <p>\n          Most of my work has taken place in complex environments rather than clean-slate projects. There is usually history, context, and trade-offs already driving decisions. That reality has shaped how I think about work: slowing down early, understanding what exists, and being deliberate about what gets introduced.\n        </p>\n        <p>\n          As experience has accumulated, my work ethic has changed. It’s become less about individual output and more about standards—how teams make decisions, and what behaviors we reinforce for our customers. I think often about designers coming up next, especially in an industry that moves quickly and doesn’t always leave room for judgment to develop.\n        </p>\n        <p>\n          Mentorship follows naturally from that responsibility. Sometimes it’s formal; often it’s not. Most of the time, it’s simply creating space to think clearly together. I care about leaving people stronger than I found them.\n        </p>\n        <p>\n          If any of this work lasts, it won’t be because of the artifacts alone. It will be because the thinking behind them continues through people who build deliberately and understand design as a form of stewardship.\n        </p>"
+    },
+    "articles": {
+        "heroTitle": "Articles",
+        "heroSubtitle": "Personal reflections",
+        "heroText": "These articles are published essays written outside the context of\n          client work. They come from the same place as my design thinking, but move at a different pace.",
+        "heroImage": "/assets/images/_Hero_Image_2.png",
+        "overviewBody": "I'm drawn to writing traditions that approach meaning\n          differently—Persian philosophy, Irish poetry, and both Western and\n          Eastern ways of shaping thought through language. Some writing leans\n          into metaphor and patience, letting meaning unfold. Other traditions\n          favor structure, clarity, and consequence. What holds my attention lives\n          between those approaches—where feeling and discipline coexist, and where\n          language is used to reveal rather than persuade. Each piece here stands\n          on its own and is presented as originally published."
+    },
+    "experience": {
+        "heroTitle": "Experience",
+        "heroSubtitle": "Selected systems work, case studies, and outcomes.",
+        "heroText": "These case studies reflect work on systems that operate across\n          products, platforms, and organizations.",
+        "heroImage": "/assets/images/_Hero_Image_1.png",
+        "overviewBody": "The focus is not on individual features, but on system-level\n          structure—how multiple surfaces coexist, how behavior remains\n          predictable at scale, and how decisions hold up over time. Each case\n          examines a different layer of that problem, from foundational\n          abstractions to global UI surfaces and embedded intelligence."
+    },
+    "gallery": {
+        "heroTitle": "Gallery",
+        "heroSubtitle": "Visual work and selected outputs",
+        "heroText": "A collection of visual work drawn from projects, explorations, and\n          ongoing practice. Presented here without client context — the focus\n          is on craft, composition, and care.",
+        "heroImage": ""
+    }
+}
