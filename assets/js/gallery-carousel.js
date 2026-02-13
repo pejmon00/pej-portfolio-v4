@@ -10,11 +10,11 @@
   var SWIPE_THRESHOLD = 50;
 
   function init() {
-    var grid = document.querySelector('.gallery-grid');
+    var grids = document.querySelectorAll('.gallery-grid');
     var lightbox = document.getElementById('lightbox');
-    if (!grid || !lightbox) return;
+    if (!grids.length || !lightbox) return;
 
-    var projects = grid.querySelectorAll('.gallery-project');
+    var projects = document.querySelectorAll('.gallery-project');
     if (!projects.length) return;
 
     var img = lightbox.querySelector('.lightbox__img');

@@ -51,37 +51,57 @@
 
       if (!targets.length) return;
 
-      // Create an observer to mark the link active when the section is mostly visible
+      // For each anchor target, find the next sibling section to observe
+      // (anchor divs are zero-height, so observe the real section instead)
+      var sectionTargets = targets.map(function (t) {
+        // Walk forward from the anchor to find the nearest section with content
+        var el = t.el;
+        var section = null;
+        while (el && !section) {
+          el = el.nextElementSibling;
+          if (el && (el.tagName === "SECTION" || el.tagName === "HR")) {
+            // Skip dividers, find the section
+            if (el.tagName === "SECTION") section = el;
+          }
+        }
+        return { hash: t.hash, el: t.el, section: section, link: t.link };
+      });
+
+      // Create an observer on the actual sections
+      var activeHash = null;
       var observer = new IntersectionObserver(
         function (entries) {
           entries.forEach(function (entry) {
-            var target = targets.find(function (t) {
-              return t.el === entry.target;
+            var target = sectionTargets.find(function (t) {
+              return t.section === entry.target;
             });
             if (!target) return;
 
-            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-              // set this link active
-              setActiveLink("#" + target.el.id, nav);
+            if (entry.isIntersecting) {
+              activeHash = target.hash;
+              setActiveLink(target.hash, nav);
             }
           });
         },
         {
           root: null,
-          threshold: [0.5],
-          rootMargin: "0px 0px -30% 0px",
+          threshold: [0.1],
+          rootMargin: "-10% 0px -60% 0px",
         },
       );
 
-      targets.forEach(function (t) {
-        if (t.el) observer.observe(t.el);
+      sectionTargets.forEach(function (t) {
+        if (t.section) observer.observe(t.section);
       });
 
-      // also respond to hashchange and load
+      // Default: set first link active on load if no hash
       function checkHash() {
         var h = location.hash || "";
-        if (!h) return;
-        // if the hash matches one of our targets, mark it active
+        if (!h) {
+          // No hash — activate first link
+          setActiveLink(targets[0].hash, nav);
+          return;
+        }
         if (
           targets.some(function (t) {
             return "#" + t.el.id === h;
@@ -92,10 +112,11 @@
       }
 
       window.addEventListener("hashchange", checkHash);
-      window.addEventListener("load", function () {
-        // mark based on initial hash
-        checkHash();
-      });
+      window.addEventListener("load", checkHash);
+      // Also set default immediately
+      if (!location.hash) {
+        setActiveLink(targets[0].hash, nav);
+      }
     });
   }
 

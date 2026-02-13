@@ -4,6 +4,7 @@
     <script>
       (function () {
         document.documentElement.classList.add("has-primary-nav");
+        document.documentElement.classList.add("has-secondary-nav");
       })();
     </script>
     <meta charset="utf-8" />
@@ -13,6 +14,9 @@
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/globals.css" />
     <link rel="stylesheet" href="/assets/css/gallery.css" />
+    <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
+    <script src="/assets/js/secondaryNavMobile.js" defer></script>
+    <script src="/assets/js/secondaryNavActive.js" defer></script>
     <script src="/assets/js/gallery-carousel.js" defer></script>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
   </head>
@@ -36,6 +40,14 @@
       </nav>
     </div>
 
+    <!-- Secondary Navigation: Gallery sections -->
+    <nav aria-label="Gallery" data-secondary-nav>
+      <ul>
+        <li><a href="#product-design-top">Product Design</a></li>
+        <li><a href="#information-design-top">Information Design</a></li>
+      </ul>
+    </nav>
+
     <!-- Page Content -->
     <main role="main">
       <!-- HERO -->
@@ -45,11 +57,16 @@
         <!-- editable:heroText --><p>A collection of visual work drawn from projects, explorations, and
           ongoing practice. Presented here without client context — the focus
           is on craft, composition, and care.</p><!-- /editable:heroText -->
-
+        <div aria-label="Hero image">
+          <img src="/assets/images/Gallery-hero.png" alt="Hero image" />
+        </div>
+        <div id="product-design-top" aria-hidden="true"></div>
       </header>
 
-      <!-- Gallery Grid -->
-      <section class="gallery-section">
+      <hr class="section-divider" aria-hidden="true" />
+      <!-- Product Design Gallery -->
+      <section class="gallery-section" aria-labelledby="product-design">
+        <h2 id="product-design" class="section-hero-title">Product Design</h2>
         <div class="gallery-grid">
           <div class="gallery-project" data-project-id="1">
             <h3 class="gallery-project__title">Amazon</h3>
@@ -146,7 +163,27 @@
               </button>
             </div>
           </div>
+        </div>
+      </section>
 
+      <div id="information-design-top" aria-hidden="true"></div>
+      <hr class="section-divider" aria-hidden="true" />
+      <!-- Information Design Gallery -->
+      <section class="gallery-section" aria-labelledby="information-design">
+        <h2 id="information-design" class="section-hero-title">Information Design</h2>
+        <div class="gallery-grid">
+          <div class="gallery-project gallery-project--placeholder">
+            <h3 class="gallery-project__title">Project Title</h3>
+            <div class="gallery-project__cover gallery-project__cover--placeholder">
+              <span>Coming Soon</span>
+            </div>
+          </div>
+          <div class="gallery-project gallery-project--placeholder">
+            <h3 class="gallery-project__title">Project Title</h3>
+            <div class="gallery-project__cover gallery-project__cover--placeholder">
+              <span>Coming Soon</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>

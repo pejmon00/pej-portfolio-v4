@@ -251,10 +251,88 @@
     Object.keys(pages).forEach(function (pageId) {
       var fields = pages[pageId];
       Object.keys(fields).forEach(function (key) {
+        if (key === 'sections' && pageId === 'gallery') {
+          _gallerySections = (fields[key] || []).slice();
+          renderGallerySections();
+          return;
+        }
         var el = document.getElementById('page-' + pageId + '-' + key);
         if (el) el.value = fields[key];
       });
     });
+  }
+
+  // ---- Gallery Sections Editor ----
+  var _gallerySections = [];
+
+  function renderGallerySections() {
+    var list = document.getElementById('gallery-sections-list');
+    if (!list) return;
+    list.innerHTML = '';
+    _gallerySections.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    _gallerySections.forEach(function (sec, idx) {
+      var div = document.createElement('div');
+      div.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+      div.innerHTML =
+        '<input type="text" value="' + escHtml(sec.label || '') + '" style="flex:1;" placeholder="Section name..." data-sec-idx="' + idx + '">' +
+        '<button type="button" class="btn btn-sm btn-secondary" title="Move up" style="padding:4px 8px;"' + (idx === 0 ? ' disabled' : '') + ' data-action="up" data-sec-idx="' + idx + '">&uarr;</button>' +
+        '<button type="button" class="btn btn-sm btn-secondary" title="Move down" style="padding:4px 8px;"' + (idx === _gallerySections.length - 1 ? ' disabled' : '') + ' data-action="down" data-sec-idx="' + idx + '">&darr;</button>' +
+        '<button type="button" class="btn btn-sm btn-danger" title="Remove" data-action="remove" data-sec-idx="' + idx + '">&times;</button>';
+      // Label input change
+      div.querySelector('input').addEventListener('input', function (e) {
+        _gallerySections[idx].label = e.target.value;
+        _gallerySections[idx].id = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      });
+      // Buttons
+      div.querySelectorAll('button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var action = btn.dataset.action;
+          var i = parseInt(btn.dataset.secIdx);
+          if (action === 'up' && i > 0) {
+            var tmp = _gallerySections[i];
+            _gallerySections[i] = _gallerySections[i - 1];
+            _gallerySections[i - 1] = tmp;
+          } else if (action === 'down' && i < _gallerySections.length - 1) {
+            var tmp = _gallerySections[i];
+            _gallerySections[i] = _gallerySections[i + 1];
+            _gallerySections[i + 1] = tmp;
+          } else if (action === 'remove') {
+            if (!confirm('Remove section "' + (_gallerySections[i].label || 'Untitled') + '"?')) return;
+            _gallerySections.splice(i, 1);
+          }
+          // Re-assign order
+          _gallerySections.forEach(function (s, j) { s.order = j + 1; });
+          renderGallerySections();
+        });
+      });
+      list.appendChild(div);
+    });
+    // Update category dropdown in gallery project modal if open
+    updateCategoryDropdown();
+  }
+
+  function addGallerySection() {
+    var order = _gallerySections.length + 1;
+    _gallerySections.push({ id: 'section-' + order, label: '', order: order });
+    renderGallerySections();
+  }
+
+  function updateCategoryDropdown() {
+    var select = document.getElementById('gp-category');
+    if (!select) return;
+    var currentVal = select.value;
+    select.innerHTML = '';
+    _gallerySections.forEach(function (sec) {
+      var opt = document.createElement('option');
+      opt.value = sec.id;
+      opt.textContent = sec.label || sec.id;
+      select.appendChild(opt);
+    });
+    // Restore selection if still valid
+    if (currentVal) {
+      var exists = _gallerySections.some(function (s) { return s.id === currentVal; });
+      if (exists) select.value = currentVal;
+    }
   }
 
   // ---- Article CRUD ----
@@ -426,8 +504,14 @@
       var key = el.id.replace('page-' + pageId + '-', '');
       fields[key] = el.value;
     });
+    // Include gallery sections
+    if (pageId === 'gallery') {
+      fields.sections = _gallerySections;
+    }
     apiCall('update_page', { pageId: pageId, fields: fields }, function (res) {
-      // status shown by apiCall
+      if (res.success && pageId === 'gallery') {
+        loadGallery(); // refresh category dropdowns
+      }
     });
   }
 
@@ -444,17 +528,48 @@
         list.innerHTML = '<li><span class="item-title" style="color:var(--admin-text-secondary);">No projects yet. Click "+ New Project" to get started.</span></li>';
         return;
       }
-      res.data.forEach(function (project) {
-        var imgCount = (project.images || []).length;
-        var li = document.createElement('li');
-        li.innerHTML =
-          '<span class="item-title">' + escHtml(project.title) + ' <small style="color:var(--admin-text-secondary);">(' + imgCount + ' image' + (imgCount !== 1 ? 's' : '') + ')</small></span>' +
-          '<span class="item-actions">' +
-            '<button class="btn btn-sm btn-secondary" onclick="Admin.editGalleryProject(' + project.id + ')">Edit</button>' +
-            '<button class="btn btn-sm btn-danger" onclick="Admin.deleteGalleryProject(' + project.id + ')">Delete</button>' +
-          '</span>';
-        list.appendChild(li);
+      // Group by category using dynamic sections
+      var sections = (_gallerySections.length ? _gallerySections : [
+        { id: 'product', label: 'Product Design' },
+        { id: 'information', label: 'Information Design' }
+      ]).slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+
+      function renderGroup(label, items) {
+        var header = document.createElement('li');
+        header.innerHTML = '<span class="item-title" style="font-weight:700;color:var(--admin-text);font-size:13px;text-transform:uppercase;letter-spacing:0.05em;">' + escHtml(label) + '</span>';
+        header.style.borderBottom = '1px solid var(--admin-border)';
+        list.appendChild(header);
+        if (!items.length) {
+          var empty = document.createElement('li');
+          empty.innerHTML = '<span class="item-title" style="color:var(--admin-text-secondary);font-size:13px;">No projects in this section</span>';
+          list.appendChild(empty);
+          return;
+        }
+        items.forEach(function (project, idx) {
+          var imgCount = (project.images || []).length;
+          var li = document.createElement('li');
+          li.innerHTML =
+            '<span class="item-title">' + escHtml(project.title) + ' <small style="color:var(--admin-text-secondary);">' + imgCount + ' image' + (imgCount !== 1 ? 's' : '') + '</small></span>' +
+            '<span class="item-actions">' +
+              '<button class="btn btn-sm btn-secondary" title="Move up" onclick="Admin.reorderGalleryProject(' + project.id + ',-1)" style="padding:4px 8px;"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>' +
+              '<button class="btn btn-sm btn-secondary" title="Move down" onclick="Admin.reorderGalleryProject(' + project.id + ',1)" style="padding:4px 8px;"' + (idx === items.length - 1 ? ' disabled' : '') + '>&darr;</button>' +
+              '<button class="btn btn-sm btn-secondary" onclick="Admin.editGalleryProject(' + project.id + ')">Edit</button>' +
+              '<button class="btn btn-sm btn-danger" onclick="Admin.deleteGalleryProject(' + project.id + ')">Delete</button>' +
+            '</span>';
+          list.appendChild(li);
+        });
+      }
+
+      sections.forEach(function (sec) {
+        var items = res.data.filter(function (p) { return (p.category || 'product') === sec.id; });
+        renderGroup(sec.label || sec.id, items);
       });
+    });
+  }
+
+  function reorderGalleryProject(id, direction) {
+    apiCall('reorder_gallery_project', { id: id, direction: direction }, function (res) {
+      if (res.success) loadGallery();
     });
   }
 
@@ -462,6 +577,9 @@
     document.getElementById('gallery-project-form-title').textContent = 'New Gallery Project';
     document.getElementById('gallery-project-form').reset();
     document.getElementById('gp-id').value = '';
+    updateCategoryDropdown();
+    var select = document.getElementById('gp-category');
+    if (select && select.options.length) select.selectedIndex = 0;
     _projectImages = [];
     renderProjectImagesGrid();
     showModal('gallery-project-modal');
@@ -474,6 +592,8 @@
       document.getElementById('gallery-project-form-title').textContent = 'Edit Gallery Project';
       document.getElementById('gp-id').value = p.id;
       document.getElementById('gp-title').value = p.title;
+      updateCategoryDropdown();
+      document.getElementById('gp-category').value = p.category || 'product';
       document.getElementById('gp-order').value = p.order;
       _projectImages = (p.images || []).slice(); // clone
       renderProjectImagesGrid();
@@ -539,6 +659,7 @@
     var data = {
       id: form.querySelector('#gp-id').value,
       title: form.querySelector('#gp-title').value,
+      category: form.querySelector('#gp-category').value,
       order: form.querySelector('#gp-order').value,
       images: _projectImages,
     };
@@ -642,10 +763,122 @@
     }
   });
 
+  // ---- Formatting Toolbar ----
+  var fmtButtons = [
+    { label: 'B', tag: 'strong', title: 'Bold' },
+    { label: 'I', tag: 'em', title: 'Italic', style: 'font-style:italic' },
+    { sep: true },
+    { label: 'H2', tag: 'h2', title: 'Heading 2', block: true },
+    { label: 'H3', tag: 'h3', title: 'Heading 3', block: true },
+    { label: 'P', tag: 'p', title: 'Paragraph', block: true },
+    { sep: true },
+    { label: 'Link', title: 'Insert Link', action: 'link' },
+    { sep: true },
+    { label: 'UL', title: 'Bulleted List', action: 'ul' },
+    { label: 'OL', title: 'Numbered List', action: 'ol' },
+    { sep: true },
+    { label: '&lt;br&gt;', title: 'Line Break', action: 'br' },
+  ];
+
+  function wrapSelection(textarea, before, after) {
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var text = textarea.value;
+    var selected = text.substring(start, end);
+    var replacement = before + (selected || 'text') + after;
+    textarea.value = text.substring(0, start) + replacement + text.substring(end);
+    textarea.focus();
+    var cursorPos = selected ? start + replacement.length : start + before.length;
+    var selectEnd = selected ? cursorPos : cursorPos + 4; // select "text" placeholder
+    textarea.setSelectionRange(selected ? cursorPos : start + before.length, selectEnd);
+  }
+
+  function insertAtCursor(textarea, text) {
+    var start = textarea.selectionStart;
+    var val = textarea.value;
+    textarea.value = val.substring(0, start) + text + val.substring(start);
+    textarea.focus();
+    var pos = start + text.length;
+    textarea.setSelectionRange(pos, pos);
+  }
+
+  function handleFmtClick(btn, textarea) {
+    if (btn.action === 'link') {
+      var url = prompt('Enter URL:');
+      if (!url) return;
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      var linkText = textarea.value.substring(start, end) || 'link text';
+      var tag = '<a href="' + url + '">' + linkText + '</a>';
+      textarea.value = textarea.value.substring(0, start) + tag + textarea.value.substring(end);
+      textarea.focus();
+    } else if (btn.action === 'ul' || btn.action === 'ol') {
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      var selected = textarea.value.substring(start, end);
+      var items;
+      if (selected) {
+        items = selected.split('\n').filter(function(l) { return l.trim(); });
+      } else {
+        items = ['Item 1', 'Item 2', 'Item 3'];
+      }
+      var listTag = btn.action;
+      var html = '<' + listTag + '>\n' + items.map(function(item) { return '  <li>' + item.trim() + '</li>'; }).join('\n') + '\n</' + listTag + '>';
+      textarea.value = textarea.value.substring(0, start) + html + textarea.value.substring(end);
+      textarea.focus();
+    } else if (btn.action === 'br') {
+      insertAtCursor(textarea, '<br>\n');
+    } else if (btn.tag) {
+      var open = '<' + btn.tag + '>';
+      var close = '</' + btn.tag + '>';
+      if (btn.block) {
+        open = '\n' + open;
+        close = close + '\n';
+      }
+      wrapSelection(textarea, open, close);
+    }
+  }
+
+  function initFormatToolbars() {
+    document.querySelectorAll('.form-group textarea').forEach(function (textarea) {
+      // Skip if already has toolbar
+      if (textarea.previousElementSibling && textarea.previousElementSibling.classList.contains('fmt-toolbar')) return;
+      var toolbar = document.createElement('div');
+      toolbar.className = 'fmt-toolbar';
+      fmtButtons.forEach(function (btn) {
+        if (btn.sep) {
+          var sep = document.createElement('span');
+          sep.className = 'fmt-sep';
+          toolbar.appendChild(sep);
+          return;
+        }
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'fmt-btn';
+        button.innerHTML = btn.label;
+        button.title = btn.title;
+        if (btn.style) button.style.cssText = btn.style;
+        button.addEventListener('click', function () {
+          handleFmtClick(btn, textarea);
+        });
+        toolbar.appendChild(button);
+      });
+      textarea.parentNode.insertBefore(toolbar, textarea);
+    });
+  }
+
+  // Also init toolbars for dynamically added section editors
+  var _origAddSectionEditor = addSectionEditor;
+  addSectionEditor = function (container, sec) {
+    _origAddSectionEditor(container, sec);
+    initFormatToolbars();
+  };
+
   // ---- Init ----
   document.addEventListener('DOMContentLoaded', function () {
     initTabs();
     initPanels();
+    initFormatToolbars();
     loadArticles();
     loadCaseStudies();
     loadPages();
@@ -668,6 +901,8 @@
     editGalleryProject: editGalleryProject,
     saveGalleryProject: saveGalleryProject,
     deleteGalleryProject: deleteGalleryProject,
+    reorderGalleryProject: reorderGalleryProject,
+    addGallerySection: addGallerySection,
     addProjectImage: addProjectImage,
     uploadImage: uploadImage,
     openImagePicker: openImagePicker,

@@ -3,9 +3,19 @@
         "logo": "/assets/icons/PEJ_PORT_LOGO.svg"
     },
     "home": {
-        "heroTitle": "My name is Pej",
-        "heroText": "I work on complex systems where clarity matters. These are systems people rely on every day—where decisions have consequences and durability matters more than novelty.",
+        "heroTitle": "Principal Product Designer",
+        "heroSubtitle": "systems, multimodal, and platform UX.",
+        "heroText": "I build durable interaction frameworks teams can ship, govern, and scale—especially where decisions carry consequences.",
         "heroImage": "/assets/images/My-headshot.jpg",
+        "logo1": "/assets/images/Company logo.png",
+        "logo2": "/assets/images/Company logo-1.png",
+        "logo3": "/assets/images/Company logo-2.png",
+        "cta1Title": "Case Studies",
+        "cta1Desc": "Systems work, outcomes & process",
+        "cta1Link": "/experience",
+        "cta2Title": "Gallery",
+        "cta2Desc": "Visual work & selected outputs",
+        "cta2Link": "/gallery",
         "servicesImage": "/assets/images/uploads/Screenshot-2026-02-12-at-4-11-27---PM-1770941497.png",
         "aboutTitle": "About",
         "aboutBody": "<p>Welcome to my site</p>\n        <p>\n          I’ve spent much of my career working on things that have to hold up over time—under real constraints and in the hands of real people. What matters most to me is how systems behave once they’re in the wild, and whether people trust what they rely on every day.\n        </p>\n        <p>\n          Most of my work has taken place in complex environments rather than clean-slate projects. There is usually history, context, and trade-offs already driving decisions. That reality has shaped how I think about work: slowing down early, understanding what exists, and being deliberate about what gets introduced.\n        </p>\n        <p>\n          As experience has accumulated, my work ethic has changed. It’s become less about individual output and more about standards—how teams make decisions, and what behaviors we reinforce for our customers. I think often about designers coming up next, especially in an industry that moves quickly and doesn’t always leave room for judgment to develop.\n        </p>\n        <p>\n          Mentorship follows naturally from that responsibility. Sometimes it’s formal; often it’s not. Most of the time, it’s simply creating space to think clearly together. I care about leaving people stronger than I found them.\n        </p>\n        <p>\n          If any of this work lasts, it won’t be because of the artifacts alone. It will be because the thinking behind them continues through people who build deliberately and understand design as a form of stewardship.\n        </p>"
@@ -28,6 +38,10 @@
         "heroTitle": "Gallery",
         "heroSubtitle": "Visual work and selected outputs",
         "heroText": "A collection of visual work drawn from projects, explorations, and\n          ongoing practice. Presented here without client context — the focus\n          is on craft, composition, and care.",
-        "heroImage": ""
+        "heroImage": "/assets/images/Gallery-hero.png",
+        "sections": [
+            {"id": "product", "label": "Product Design", "order": 1},
+            {"id": "information", "label": "Information Design", "order": 2}
+        ]
     }
 }

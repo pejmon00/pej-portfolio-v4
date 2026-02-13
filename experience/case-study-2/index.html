@@ -18,6 +18,378 @@
     <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
     <script src="/assets/js/secondaryNavMobile.js" defer></script>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+
+    <style>
+      /* ── Glass Window Manager Hero (scoped) ── */
+      .gw-hero {
+        --gw-primitives: #6366f1;
+        --gw-inputs: #f43f5e;
+        --gw-display: #f59e0b;
+        --gw-navigation: #10b981;
+        --gw-feedback: #8b5cf6;
+        --gw-layout: #06b6d4;
+        --gw-overlay: #ec4899;
+
+        position: relative;
+        background: #06060b;
+        border-radius: 12px;
+        margin: var(--space-4) 0;
+        overflow: hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #e4e4ef;
+        height: 448px;
+        cursor: default;
+        user-select: none;
+      }
+
+      /* Iridescent top edge */
+      .gw-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #6366f1, #8b5cf6, #ec4899, #f43f5e, #f59e0b, #10b981, #06b6d4, transparent);
+        background-size: 300% 100%;
+        animation: gwShift 5s linear infinite;
+        opacity: 0.4;
+        z-index: 10;
+      }
+      .gw-hero::after {
+        content: '';
+        position: absolute;
+        top: -1px; left: 15%; right: 15%;
+        height: 8px;
+        background: linear-gradient(90deg, transparent, #6366f1, #8b5cf6, #ec4899, #f43f5e, #f59e0b, #10b981, #06b6d4, transparent);
+        background-size: 300% 100%;
+        animation: gwShift 5s linear infinite;
+        opacity: 0.08;
+        z-index: 9;
+        filter: blur(8px);
+      }
+      @keyframes gwShift { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+
+      /* Ambient orbs */
+      .gw-ambient { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+      .gw-ambient-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.12;
+        animation: gwDrift 20s ease-in-out infinite alternate;
+      }
+      .gw-ambient-orb:nth-child(1) { width: 300px; height: 300px; background: var(--gw-primitives); top: -100px; left: -50px; animation-delay: 0s; }
+      .gw-ambient-orb:nth-child(2) { width: 250px; height: 250px; background: var(--gw-overlay); bottom: -100px; right: -50px; animation-delay: -5s; }
+      .gw-ambient-orb:nth-child(3) { width: 200px; height: 200px; background: var(--gw-navigation); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -10s; }
+      .gw-ambient-orb:nth-child(4) { width: 180px; height: 180px; background: var(--gw-display); top: 20%; right: 20%; animation-delay: -15s; }
+
+      @keyframes gwDrift {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(15px, -10px) scale(1.05); }
+        66% { transform: translate(-10px, 15px) scale(0.95); }
+        100% { transform: translate(5px, 5px) scale(1.02); }
+      }
+
+      /* Grid lines */
+      .gw-grid-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+      }
+
+      /* Flash effect */
+      .gw-focus-flash {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04), transparent 70%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      .gw-focus-flash.gw-active { opacity: 1; }
+
+      /* HUD */
+      .gw-hud {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        z-index: 15;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #1a1a28;
+      }
+      .gw-hud-left { display: flex; flex-direction: column; gap: 2px; }
+      .gw-hud-logo { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; color: #e4e4ef; display: flex; align-items: center; gap: 8px; }
+      .gw-hud-badge {
+        font-size: 0.5rem;
+        padding: 2px 6px;
+        border-radius: 5px;
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .gw-hud-active { font-size: 0.7rem; font-weight: 600; color: #e4e4ef; display: flex; align-items: center; gap: 6px; }
+      .gw-active-dot { width: 6px; height: 6px; border-radius: 50%; transition: background 0.3s; }
+      .gw-active-label { transition: color 0.3s; }
+      .gw-hud-right { display: flex; align-items: center; gap: 12px; }
+      .gw-hud-meta { font-size: 0.6rem; color: #3a3a4f; letter-spacing: 0.08em; text-transform: uppercase; }
+      .gw-layer-dots { display: flex; gap: 4px; }
+      .gw-layer-dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.15);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+        padding: 0;
+      }
+      .gw-layer-dot.gw-dot-active { transform: scale(1.3); border-color: transparent; }
+
+      /* 3D Scene */
+      .gw-scene {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        perspective: 1400px;
+        perspective-origin: 50% 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .gw-scene-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+      }
+
+      /* Glass Panes */
+      .gw-glass-pane {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-style: preserve-3d;
+        cursor: pointer;
+        transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .gw-glass-pane::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.18);
+        pointer-events: none;
+        z-index: 2;
+        transition: border-color 0.5s ease;
+      }
+      .gw-glass-pane:hover::before { border-color: rgba(255,255,255,0.32); }
+      .gw-glass-pane::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(255,255,255,0.04) 100%);
+        pointer-events: none;
+        z-index: 3;
+      }
+      .gw-glass-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 14px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        background: rgba(12,12,20,0.55);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+      }
+      .gw-glass-pane.gw-focused { z-index: 100 !important; }
+      .gw-glass-pane.gw-focused::before { border-color: rgba(255,255,255,0.25); box-shadow: 0 0 40px rgba(255,255,255,0.03); }
+      .gw-glass-pane.gw-receded { opacity: 0.35; filter: blur(1px); cursor: pointer; }
+      .gw-glass-pane.gw-receded:hover { opacity: 0.6; filter: blur(0px); }
+
+      /* Pane title bar */
+      .gw-pane-titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        flex-shrink: 0;
+      }
+      .gw-pane-title-left { display: flex; align-items: center; gap: 8px; }
+      .gw-pane-element-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        font-weight: 600;
+      }
+      .gw-badge-weight { font-size: 0.5rem; opacity: 0.5; }
+      .gw-pane-title-text { font-size: 0.75rem; font-weight: 600; color: #e4e4ef; }
+      .gw-pane-title-right { display: flex; gap: 4px; }
+      .gw-pane-dot { width: 8px; height: 8px; border-radius: 50%; opacity: 0.5; }
+      .gw-comp-content { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+      .gw-pane-watermark {
+        position: absolute;
+        bottom: 10px; right: 14px;
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        opacity: 0.06;
+        pointer-events: none;
+        z-index: 0;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      /* Mini component styles (scoped) */
+      .gw-hero .gw-mini-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.6rem;
+        font-weight: 600;
+        border: none;
+        cursor: default;
+        color: white;
+      }
+      .gw-hero .gw-mini-btn-ghost {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #aaa;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.6rem;
+      }
+      .gw-hero .gw-mini-input {
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        font-size: 0.6rem;
+        color: #6b6b80;
+        font-family: 'Inter', sans-serif;
+      }
+      .gw-hero .gw-mini-label {
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b6b80;
+      }
+      .gw-hero .gw-mini-text { font-size: 0.65rem; color: #8b8ba0; line-height: 1.4; }
+      .gw-hero .gw-mini-divider { height: 1px; background: rgba(255,255,255,0.05); }
+      .gw-hero .gw-mini-avatar {
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.5rem;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+      }
+      .gw-hero .gw-mini-badge {
+        padding: 1px 6px;
+        border-radius: 8px;
+        font-size: 0.5rem;
+        font-weight: 600;
+      }
+      .gw-hero .gw-mini-row { display: flex; align-items: center; gap: 6px; }
+      .gw-hero .gw-mini-name { font-size: 0.65rem; font-weight: 600; color: #ccc; }
+      .gw-hero .gw-mini-sub { font-size: 0.5rem; color: #555; }
+
+      /* HUD Navigation Buttons */
+      .gw-hud-nav { display: flex; align-items: center; gap: 6px; margin-left: 8px; }
+      .gw-hud-nav-btn {
+        padding: 5px 14px;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #e4e4ef;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      }
+      .gw-hud-nav-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.22); }
+      .gw-hud-nav-btn:active { transform: scale(0.93); }
+
+      /* Depth indicator */
+      .gw-depth-indicator {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+      }
+      .gw-depth-line {
+        width: 2px;
+        height: 50px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 1px;
+        position: relative;
+      }
+      .gw-depth-marker {
+        position: absolute;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        left: -2px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        cursor: pointer;
+      }
+      .gw-depth-label {
+        font-size: 0.45rem;
+        color: #3a3a4f;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        writing-mode: vertical-lr;
+        margin-top: 6px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .gw-hero { height: 380px; border-radius: 8px; }
+        .gw-hud { padding: 12px 14px 10px; }
+        .gw-hud-logo { font-size: 0.85rem; }
+        .gw-hud-meta { display: none; }
+        .gw-hud-nav-btn { padding: 4px 10px; font-size: 0.7rem; min-height: 32px; }
+        .gw-depth-indicator { display: none; }
+      }
+      @media (max-width: 480px) {
+        .gw-hero { height: 300px; }
+        .gw-hud { padding: 10px 12px 8px; }
+        .gw-hud-logo { font-size: 0.75rem; }
+        .gw-hud-nav-btn { padding: 4px 8px; font-size: 0.65rem; }
+      }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   </head>
 
   <body>
@@ -58,13 +430,6 @@
         <p>Case Study 02</p>
       </header>
 
-      <!-- Governed Hero Media Slot -->
-      <section aria-label="Hero image">
-        <div aria-label="Hero image">
-          <img src="/assets/images/_Hero_Image_5.png" alt="Window Management System hero image" />
-        </div>
-      </section>
-
       <!-- Context -->
       <section aria-labelledby="context">
         <h2 id="context" class="section-hero-title">Overview</h2>
@@ -76,6 +441,7 @@
           visually coherent.
         </p>
       </section>
+
       <!-- Problem -->
       <section aria-labelledby="problem">
         <h2 id="problem">Role</h2>
@@ -86,6 +452,50 @@
           coordination across processes.
         </p>
       </section>
+
+      <!-- Interactive Glass Window Manager Hero -->
+      <section class="gw-hero" aria-label="Interactive glass window manager demo" tabindex="0">
+        <div class="gw-ambient">
+          <div class="gw-ambient-orb"></div>
+          <div class="gw-ambient-orb"></div>
+          <div class="gw-ambient-orb"></div>
+          <div class="gw-ambient-orb"></div>
+        </div>
+        <div class="gw-grid-bg"></div>
+        <div class="gw-focus-flash" id="gwFocusFlash"></div>
+
+        <!-- HUD -->
+        <div class="gw-hud">
+          <div class="gw-hud-left">
+            <div class="gw-hud-logo">Glass Layers <span class="gw-hud-badge">7 Layers</span></div>
+            <div class="gw-hud-meta" id="gwHudMeta">Window Management System &middot; 3D Depth</div>
+          </div>
+          <div class="gw-hud-right">
+            <div class="gw-hud-active">
+              <div class="gw-active-dot" id="gwActiveDot"></div>
+              <span class="gw-active-label" id="gwActiveLabel">Select a layer</span>
+            </div>
+            <div class="gw-layer-dots" id="gwLayerDots"></div>
+            <div class="gw-hud-nav">
+              <button class="gw-hud-nav-btn" id="gwKeyPrev" aria-label="Previous layer">&larr;</button>
+              <button class="gw-hud-nav-btn" id="gwKeyNext" aria-label="Next layer">&rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Scene -->
+        <div class="gw-scene" id="gwScene">
+          <div class="gw-scene-inner" id="gwSceneInner"></div>
+        </div>
+
+        <!-- Depth Indicator -->
+        <div class="gw-depth-indicator" id="gwDepthIndicator">
+          <div class="gw-depth-line" id="gwDepthLine"></div>
+          <div class="gw-depth-label">Depth</div>
+        </div>
+
+      </section>
+
       <!-- Approach -->
       <section aria-labelledby="approach">
         <h2 id="approach">System / Work</h2>
@@ -157,5 +567,384 @@
 
     <!-- Client-side includes script -->
     <script src="/_includes.js" defer></script>
+
+    <!-- Glass Window Manager Interactive Script -->
+    <script>
+    (function() {
+      var S = 0.5; // scale factor for fitting into container
+
+      var layers = [
+        {
+          id: 'card', symbol: 'Cd', weight: 4, name: 'Card', cat: 'layout', color: '#06b6d4',
+          w: Math.round(360*S), h: Math.round(320*S),
+          content: '<div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">' +
+            '<div style="width:100%;height:60px;border-radius:8px;background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(99,102,241,0.1));display:flex;align-items:center;justify-content:center">' +
+              '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(6,182,212,0.5)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/></svg>' +
+            '</div>' +
+            '<div style="margin-top:8px"><div class="gw-mini-name" style="font-size:0.7rem">System Status Card</div>' +
+            '<div class="gw-mini-text" style="margin-top:4px">All services operational.</div></div>' +
+            '<div style="display:flex;gap:6px;margin-top:auto">' +
+              '<div class="gw-mini-btn" style="background:rgba(6,182,212,0.15);color:#06b6d4;flex:1;justify-content:center">View</div>' +
+              '<div class="gw-mini-btn-ghost">Dismiss</div>' +
+            '</div></div>' +
+            '<div class="gw-pane-watermark" style="color:#06b6d4">Cd</div>'
+        },
+        {
+          id: 'toast', symbol: 'Ts', weight: 3, name: 'Toast', cat: 'feedback', color: '#8b5cf6',
+          w: Math.round(400*S), h: Math.round(110*S),
+          content: '<div style="display:flex;align-items:center;gap:10px;height:100%;position:relative;z-index:1">' +
+            '<div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' +
+            '</div>' +
+            '<div style="flex:1"><div class="gw-mini-name">Changes saved</div>' +
+            '<div class="gw-mini-sub" style="color:#6b6b80">Settings updated successfully.</div></div>' +
+            '<div style="color:#3a3a4f;font-size:1rem;cursor:default">&times;</div></div>' +
+            '<div class="gw-pane-watermark" style="color:#8b5cf6;bottom:6px">Ts</div>'
+        },
+        {
+          id: 'modal', symbol: 'Md', weight: 5, name: 'Modal', cat: 'overlay', color: '#ec4899',
+          w: Math.round(440*S), h: Math.round(360*S),
+          content: '<div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">' +
+              '<div class="gw-mini-name" style="font-size:0.75rem">Confirm Action</div>' +
+              '<div style="color:#3a3a4f;font-size:1rem;cursor:default">&times;</div></div>' +
+            '<div class="gw-mini-divider"></div>' +
+            '<div class="gw-mini-text" style="margin:10px 0">Deploy to production? This affects all active users.</div>' +
+            '<div class="gw-mini-label" style="margin-bottom:4px">Deployment note</div>' +
+            '<div class="gw-mini-input" style="margin-bottom:10px">v2.4.1 — perf improvements</div>' +
+            '<div style="display:flex;gap:6px;margin-top:auto">' +
+              '<div class="gw-mini-btn-ghost" style="flex:1;text-align:center;display:flex;justify-content:center">Cancel</div>' +
+              '<div class="gw-mini-btn" style="background:rgba(236,72,153,0.2);color:#ec4899;flex:1;justify-content:center">Deploy</div>' +
+            '</div></div>' +
+            '<div class="gw-pane-watermark" style="color:#ec4899">Md</div>'
+        },
+        {
+          id: 'navbar', symbol: 'Nb', weight: 5, name: 'Navbar', cat: 'navigation', color: '#10b981',
+          w: Math.round(820*S), h: Math.round(130*S),
+          content: '<div style="display:flex;align-items:center;height:100%;gap:16px;position:relative;z-index:1">' +
+            '<div style="font-weight:900;font-size:1rem;color:#10b981;letter-spacing:-0.03em;flex-shrink:0">&#9670; Acme</div>' +
+            '<div style="display:flex;gap:14px;flex:1">' +
+              '<span style="font-size:0.7rem;color:#e4e4ef;font-weight:600;position:relative">Dashboard<span style="position:absolute;bottom:-4px;left:0;right:0;height:2px;background:#10b981;border-radius:1px"></span></span>' +
+              '<span style="font-size:0.7rem;color:#6b6b80">Projects</span>' +
+              '<span style="font-size:0.7rem;color:#6b6b80">Analytics</span>' +
+              '<span style="font-size:0.7rem;color:#6b6b80">Team</span></div>' +
+            '<div class="gw-mini-input" style="width:100px;border-radius:8px;font-size:0.6rem">Search...</div>' +
+            '<div style="display:flex;align-items:center;gap:6px">' +
+              '<div style="width:7px;height:7px;border-radius:50%;background:rgba(16,185,129,0.4);box-shadow:0 0 6px rgba(16,185,129,0.3)"></div>' +
+              '<div class="gw-mini-avatar" style="width:26px;height:26px;background:rgba(16,185,129,0.2);color:#10b981;border:1.5px solid rgba(16,185,129,0.3)">PJ</div>' +
+            '</div></div>' +
+            '<div style="position:absolute;top:50%;right:16px;transform:translateY(-50%);font-size:3rem;font-weight:900;color:#10b981;opacity:0.04;pointer-events:none;letter-spacing:-0.04em;z-index:0">NAVBAR</div>'
+        },
+        {
+          id: 'form', symbol: 'Fm', weight: 5, name: 'Form', cat: 'inputs', color: '#f43f5e',
+          w: Math.round(360*S), h: Math.round(380*S),
+          content: '<div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">' +
+            '<div class="gw-mini-name" style="font-size:0.7rem;margin-bottom:2px">Create Account</div>' +
+            '<div class="gw-mini-sub" style="color:#4a4a60;margin-bottom:10px">Enter your details below</div>' +
+            '<div class="gw-mini-label" style="margin-bottom:2px">Full name</div>' +
+            '<div class="gw-mini-input" style="margin-bottom:8px">Pej Aryanpour</div>' +
+            '<div class="gw-mini-label" style="margin-bottom:2px">Email</div>' +
+            '<div class="gw-mini-input" style="margin-bottom:8px">pej@example.com</div>' +
+            '<div class="gw-mini-label" style="margin-bottom:2px">Password</div>' +
+            '<div class="gw-mini-input" style="margin-bottom:10px">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">' +
+              '<div style="width:12px;height:12px;border-radius:3px;border:1.5px solid rgba(244,63,94,0.4);display:flex;align-items:center;justify-content:center">' +
+                '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>' +
+              '<span style="font-size:0.5rem;color:#6b6b80">I agree to the terms</span></div>' +
+            '<div class="gw-mini-btn" style="background:rgba(244,63,94,0.2);color:#f43f5e;justify-content:center;width:100%;border-radius:6px">Sign Up</div>' +
+            '</div>' +
+            '<div class="gw-pane-watermark" style="color:#f43f5e">Fm</div>'
+        },
+        {
+          id: 'table', symbol: 'Tl', weight: 5, name: 'Table', cat: 'display', color: '#f59e0b',
+          w: Math.round(480*S), h: Math.round(300*S),
+          content: '<div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+              '<div class="gw-mini-name" style="font-size:0.7rem">Recent Orders</div>' +
+              '<div class="gw-mini-badge" style="background:rgba(245,158,11,0.12);color:#f59e0b">142</div></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.45rem;text-transform:uppercase;letter-spacing:0.08em;color:#3a3a4f;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)">' +
+              '<span>Customer</span><span>Product</span><span>Amount</span><span>Status</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.55rem;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center">' +
+              '<div class="gw-mini-row" style="gap:4px"><div class="gw-mini-avatar" style="width:16px;height:16px;background:rgba(99,102,241,0.2);font-size:0.4rem;color:#6366f1">AK</div><span style="color:#ccc">A. Kim</span></div>' +
+              '<span style="color:#6b6b80">Pro</span><span style="color:#ccc;font-family:\'JetBrains Mono\',monospace;font-size:0.5rem">$49</span>' +
+              '<span class="gw-mini-badge" style="background:rgba(16,185,129,0.12);color:#10b981;font-size:0.4rem">Paid</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.55rem;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center">' +
+              '<div class="gw-mini-row" style="gap:4px"><div class="gw-mini-avatar" style="width:16px;height:16px;background:rgba(236,72,153,0.2);font-size:0.4rem;color:#ec4899">MR</div><span style="color:#ccc">M. Rivera</span></div>' +
+              '<span style="color:#6b6b80">Ent</span><span style="color:#ccc;font-family:\'JetBrains Mono\',monospace;font-size:0.5rem">$199</span>' +
+              '<span class="gw-mini-badge" style="background:rgba(245,158,11,0.12);color:#f59e0b;font-size:0.4rem">Pend</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.55rem;padding:6px 0;align-items:center">' +
+              '<div class="gw-mini-row" style="gap:4px"><div class="gw-mini-avatar" style="width:16px;height:16px;background:rgba(6,182,212,0.2);font-size:0.4rem;color:#06b6d4">JL</div><span style="color:#ccc">J. Lee</span></div>' +
+              '<span style="color:#6b6b80">Start</span><span style="color:#ccc;font-family:\'JetBrains Mono\',monospace;font-size:0.5rem">$12</span>' +
+              '<span class="gw-mini-badge" style="background:rgba(16,185,129,0.12);color:#10b981;font-size:0.4rem">Paid</span></div>' +
+            '</div>' +
+            '<div class="gw-pane-watermark" style="color:#f59e0b">Tl</div>'
+        },
+        {
+          id: 'sidebar', symbol: 'Sd', weight: 5, name: 'Sidebar', cat: 'navigation', color: '#10b981',
+          w: Math.round(320*S), h: Math.round(480*S),
+          content: '<div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">' +
+              '<div style="width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.7rem;color:#10b981">A</div>' +
+              '<div><div style="font-size:0.65rem;font-weight:700;color:#e4e4ef">Acme Corp</div>' +
+              '<div style="font-size:0.5rem;color:#3a3a4f">Free plan</div></div></div>' +
+            '<div class="gw-mini-label" style="margin-bottom:6px;font-size:0.45rem">Main</div>' +
+            '<div style="display:flex;flex-direction:column;gap:2px;margin-bottom:14px">' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.12)">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
+                '<span style="font-size:0.65rem;font-weight:600;color:#10b981">Dashboard</span></div>' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Projects</span>' +
+                '<span class="gw-mini-badge" style="background:rgba(139,92,246,0.12);color:#8b5cf6;margin-left:auto">3</span></div>' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Activity</span></div>' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Team</span></div>' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Messages</span>' +
+                '<span style="width:6px;height:6px;border-radius:50%;background:#f43f5e;margin-left:auto;box-shadow:0 0 4px rgba(244,63,94,0.4)"></span></div>' +
+            '</div>' +
+            '<div class="gw-mini-label" style="margin-bottom:6px;font-size:0.45rem">Settings</div>' +
+            '<div style="display:flex;flex-direction:column;gap:2px">' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Preferences</span></div>' +
+              '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+                '<span style="font-size:0.65rem;color:#8b8ba0">Security</span></div>' +
+            '</div></div>' +
+            '<div style="position:absolute;bottom:14px;left:16px;right:16px;z-index:0"><div style="font-size:3rem;font-weight:900;color:#10b981;opacity:0.04;letter-spacing:-0.04em;line-height:0.85">SIDE<br>BAR</div></div>'
+        }
+      ];
+
+      // 3D positioning (scaled)
+      var positions = [
+        { x: -28,  y: 11,   z: -55,   rx: 2,  ry: -6  },
+        { x: 99,   y: -66,  z: -138,  rx: -2, ry: 4   },
+        { x: -11,  y: 17,   z: -231,  rx: 1,  ry: -3  },
+        { x: 0,    y: -99,  z: 28,    rx: 6,  ry: 0   },
+        { x: -110, y: 33,   z: -176,  rx: 0,  ry: 10  },
+        { x: 66,   y: 44,   z: -286,  rx: -2, ry: -5  },
+        { x: -176, y: -22,  z: -28,   rx: -1, ry: 14  }
+      ];
+
+      var sceneInner = document.getElementById('gwSceneInner');
+      var layerDotsContainer = document.getElementById('gwLayerDots');
+      var depthLine = document.getElementById('gwDepthLine');
+      var focusedIndex = -1;
+      var paneElements = [];
+
+      layers.forEach(function(layer, i) {
+        var pos = positions[i];
+
+        var pane = document.createElement('div');
+        pane.className = 'gw-glass-pane';
+        pane.style.width = layer.w + 'px';
+        pane.style.height = layer.h + 'px';
+        pane.style.zIndex = 10 + i;
+        pane.dataset.index = i;
+
+        setNormalTransform(pane, pos);
+
+        pane.innerHTML =
+          '<div class="gw-glass-inner">' +
+            '<div class="gw-pane-titlebar">' +
+              '<div class="gw-pane-title-left">' +
+                '<div class="gw-pane-element-badge" style="background:' + layer.color + '15;color:' + layer.color + '">' +
+                  '<span class="gw-badge-weight">' + layer.weight + '</span>' +
+                  layer.symbol +
+                '</div>' +
+                '<span class="gw-pane-title-text">' + layer.name + '</span>' +
+              '</div>' +
+              '<div class="gw-pane-title-right">' +
+                '<div class="gw-pane-dot" style="background:#f43f5e"></div>' +
+                '<div class="gw-pane-dot" style="background:#f59e0b"></div>' +
+                '<div class="gw-pane-dot" style="background:#10b981"></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="gw-comp-content">' + layer.content + '</div>' +
+          '</div>';
+
+        // Click to focus/unfocus
+        pane.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (focusedIndex === i) {
+            resetView();
+          } else {
+            focusOn(i);
+          }
+        });
+
+        sceneInner.appendChild(pane);
+        paneElements.push(pane);
+
+        // HUD dot
+        var dot = document.createElement('button');
+        dot.className = 'gw-layer-dot';
+        dot.style.borderColor = layer.color + '40';
+        dot.dataset.index = i;
+        dot.setAttribute('aria-label', layer.name);
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          focusOn(i);
+        });
+        layerDotsContainer.appendChild(dot);
+
+        // Depth marker
+        var marker = document.createElement('div');
+        marker.className = 'gw-depth-marker';
+        marker.style.background = layer.color;
+        marker.style.boxShadow = '0 0 6px ' + layer.color + '60';
+        var maxZ = 400;
+        var depthPercent = ((pos.z + maxZ) / (maxZ * 1.2)) * 100;
+        marker.style.top = Math.max(0, Math.min(100, 100 - depthPercent)) + '%';
+        marker.dataset.index = i;
+        marker.addEventListener('click', function(e) {
+          e.stopPropagation();
+          focusOn(i);
+        });
+        depthLine.appendChild(marker);
+      });
+
+      function setNormalTransform(pane, pos) {
+        pane.style.transform = 'translate(-50%, -50%) translate3d(' + pos.x + 'px, ' + pos.y + 'px, ' + pos.z + 'px) rotateX(' + pos.rx + 'deg) rotateY(' + pos.ry + 'deg)';
+      }
+
+      function focusOn(index) {
+        focusedIndex = index;
+        var layer = layers[index];
+
+        // Flash
+        var flash = document.getElementById('gwFocusFlash');
+        flash.classList.add('gw-active');
+        setTimeout(function() { flash.classList.remove('gw-active'); }, 400);
+
+        // HUD
+        document.getElementById('gwActiveDot').style.background = layer.color;
+        document.getElementById('gwActiveLabel').textContent = layer.symbol + ' \u2014 ' + layer.name;
+        document.getElementById('gwActiveLabel').style.color = layer.color;
+        document.getElementById('gwHudMeta').textContent = 'Weight ' + layer.weight + ' \u00b7 ' + layer.cat;
+
+        document.querySelectorAll('.gw-layer-dot').forEach(function(d, di) {
+          if (di === index) {
+            d.classList.add('gw-dot-active');
+            d.style.background = layers[di].color;
+          } else {
+            d.classList.remove('gw-dot-active');
+            d.style.background = 'transparent';
+          }
+        });
+
+        // Panes
+        paneElements.forEach(function(pane, pi) {
+          if (pi === index) {
+            pane.classList.add('gw-focused');
+            pane.classList.remove('gw-receded');
+            pane.style.transform = 'translate(-50%, -50%) translate3d(0px, 0px, 80px) rotateX(0deg) rotateY(0deg)';
+            pane.style.zIndex = 100;
+          } else {
+            pane.classList.remove('gw-focused');
+            pane.classList.add('gw-receded');
+            var p = positions[pi];
+            var spreadX = p.x * 1.4;
+            var spreadY = p.y * 1.1;
+            var spreadZ = p.z - 200;
+            pane.style.transform = 'translate(-50%, -50%) translate3d(' + spreadX + 'px, ' + spreadY + 'px, ' + spreadZ + 'px) rotateX(' + p.rx + 'deg) rotateY(' + p.ry + 'deg)';
+            pane.style.zIndex = 10 + pi;
+          }
+        });
+      }
+
+      function resetView() {
+        focusedIndex = -1;
+
+        document.getElementById('gwActiveDot').style.background = 'transparent';
+        document.getElementById('gwActiveLabel').textContent = 'Select a layer';
+        document.getElementById('gwActiveLabel').style.color = '#e4e4ef';
+        document.getElementById('gwHudMeta').textContent = '7 layers \u00b7 3D depth';
+
+        document.querySelectorAll('.gw-layer-dot').forEach(function(d) {
+          d.classList.remove('gw-dot-active');
+          d.style.background = 'transparent';
+        });
+
+        paneElements.forEach(function(pane, pi) {
+          pane.classList.remove('gw-focused', 'gw-receded');
+          setNormalTransform(pane, positions[pi]);
+          pane.style.zIndex = 10 + pi;
+        });
+      }
+
+      // Background click resets
+      document.getElementById('gwScene').addEventListener('click', function(e) {
+        if (e.target === document.getElementById('gwScene') || e.target === document.getElementById('gwSceneInner')) {
+          resetView();
+        }
+      });
+
+      // Start with the first component (Card) in focus
+      focusOn(0);
+
+      // Bottom-bar button clicks
+      document.getElementById('gwKeyPrev').addEventListener('click', function(e) {
+        e.stopPropagation();
+        var prev = focusedIndex > 0 ? focusedIndex - 1 : layers.length - 1;
+        focusOn(prev);
+      });
+      document.getElementById('gwKeyNext').addEventListener('click', function(e) {
+        e.stopPropagation();
+        var next = focusedIndex < layers.length - 1 ? focusedIndex + 1 : 0;
+        focusOn(next);
+      });
+
+      // Keyboard navigation — scoped to when hero is focused or always active on page
+      document.addEventListener('keydown', function(e) {
+        // Only respond if the gw-hero or body is focused (not in an input)
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'Escape') {
+          resetView();
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          var next = focusedIndex < layers.length - 1 ? focusedIndex + 1 : 0;
+          focusOn(next);
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var prev = focusedIndex > 0 ? focusedIndex - 1 : layers.length - 1;
+          focusOn(prev);
+        }
+      });
+
+      // Parallax (subtle mouse tracking)
+      var targetRX = 0, targetRY = 0;
+      var currentRX = 0, currentRY = 0;
+
+      document.addEventListener('mousemove', function(e) {
+        var mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        var mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        targetRY = mouseX * 4;
+        targetRX = -mouseY * 2;
+      });
+
+      function animateParallax() {
+        currentRX += (targetRX - currentRX) * 0.04;
+        currentRY += (targetRY - currentRY) * 0.04;
+
+        if (focusedIndex === -1) {
+          sceneInner.style.transform = 'rotateX(' + currentRX + 'deg) rotateY(' + currentRY + 'deg)';
+        } else {
+          sceneInner.style.transform = 'rotateX(' + (currentRX * 0.2) + 'deg) rotateY(' + (currentRY * 0.2) + 'deg)';
+        }
+
+        requestAnimationFrame(animateParallax);
+      }
+
+      animateParallax();
+    })();
+    </script>
+
   </body>
 </html>

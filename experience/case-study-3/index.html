@@ -18,6 +18,289 @@
     <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
     <script src="/assets/js/secondaryNavMobile.js" defer></script>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+
+    <style>
+      /* ── Widget Drawer Hero (scoped) ── */
+      .wd-hero {
+        position: relative;
+        background: #0c0c14;
+        border-radius: 12px;
+        margin: var(--space-4) 0;
+        overflow: hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #e4e4ef;
+        height: 448px;
+        display: flex;
+        flex-direction: column;
+        user-select: none;
+      }
+
+      /* Iridescent top edge */
+      .wd-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #6366f1, #8b5cf6, #ec4899, #f43f5e, #f59e0b, #10b981, #06b6d4, transparent);
+        background-size: 300% 100%;
+        animation: wdShift 5s linear infinite;
+        opacity: 0.4;
+        z-index: 10;
+      }
+      .wd-hero::after {
+        content: '';
+        position: absolute;
+        top: -1px; left: 15%; right: 15%;
+        height: 8px;
+        background: linear-gradient(90deg, transparent, #6366f1, #8b5cf6, #ec4899, #f43f5e, #f59e0b, #10b981, #06b6d4, transparent);
+        background-size: 300% 100%;
+        animation: wdShift 5s linear infinite;
+        opacity: 0.08;
+        z-index: 9;
+        filter: blur(8px);
+      }
+      @keyframes wdShift { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+
+      /* Header */
+      .wd-header {
+        flex-shrink: 0;
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #1a1a28;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        z-index: 15;
+      }
+      .wd-header-left { display: flex; flex-direction: column; gap: 2px; }
+      .wd-title {
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #e4e4ef;
+        margin: 0;
+      }
+      .wd-title-badge {
+        font-size: 0.5rem;
+        padding: 2px 6px;
+        border-radius: 5px;
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .wd-subtitle { font-size: 0.6rem; color: #3a3a4f; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+      .wd-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .wd-filter {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6b6b80;
+        border: 1px solid #1a1a28;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-family: inherit;
+      }
+      .wd-filter:hover { border-color: #252538; color: #e4e4ef; }
+      .wd-filter.wd-active { background: rgba(255,255,255,0.04); border-color: #252538; color: #e4e4ef; }
+
+      /* Widget grid (scrollable) */
+      .wd-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 16px 20px;
+        scroll-behavior: smooth;
+      }
+      .wd-body::-webkit-scrollbar { width: 3px; }
+      .wd-body::-webkit-scrollbar-track { background: transparent; }
+      .wd-body::-webkit-scrollbar-thumb { background: #1a1a28; border-radius: 2px; }
+
+      .wd-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      /* Widget card */
+      .wd-card {
+        border-radius: 12px;
+        border: 1px solid #1a1a28;
+        background: #111119;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        outline: none;
+      }
+      .wd-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .wd-card:hover { border-color: #252538; transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
+      .wd-card.wd-selected {
+        border-color: var(--wd-cat-color, #252538);
+        box-shadow: 0 0 0 1px var(--wd-cat-color, transparent), 0 8px 30px rgba(0,0,0,0.4);
+        transform: translateY(-3px) scale(1.01);
+      }
+      .wd-card.wd-selected::before {
+        opacity: 1;
+        background: radial-gradient(ellipse at top left, var(--wd-cat-glow, rgba(99,102,241,0.06)), transparent 70%);
+      }
+      .wd-card.wd-dimmed { opacity: 0.2; transform: scale(0.97); pointer-events: none; display: none; }
+
+      /* Element tile */
+      .wd-el-tile {
+        position: absolute;
+        top: 10px; left: 10px;
+        z-index: 10;
+        width: 46px; height: 50px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.06);
+        transition: all 0.3s ease;
+      }
+      .wd-card.wd-selected .wd-el-tile { border-color: rgba(255,255,255,0.12); transform: scale(1.06); }
+      .wd-el-tile .wd-el-w { position: absolute; top: 3px; left: 5px; font-size: 0.4rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; opacity: 0.5; }
+      .wd-el-tile .wd-el-sym { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+      .wd-el-tile .wd-el-name { font-size: 0.35rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-top: 1px; }
+
+      /* Widget body */
+      .wd-card-body { padding: 10px; padding-left: 64px; min-height: 110px; display: flex; flex-direction: column; position: relative; z-index: 1; }
+      .wd-card-body.wd-full { padding-left: 10px; padding-top: 66px; }
+      .wd-watermark { position: absolute; bottom: 6px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.025; pointer-events: none; z-index: 0; line-height: 1; letter-spacing: -0.04em; }
+
+      /* Mini component styles */
+      .wd-hero .wm-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; font-size: 0.55rem; font-weight: 600; border: none; cursor: default; }
+      .wd-hero .wm-btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #888; padding: 5px 10px; border-radius: 6px; font-size: 0.55rem; font-weight: 500; }
+      .wd-hero .wm-input { padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); font-size: 0.55rem; color: #6b6b80; font-family: inherit; }
+      .wd-hero .wm-label { font-size: 0.45rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #3a3a4f; }
+      .wd-hero .wm-text { font-size: 0.55rem; color: #6b6b80; line-height: 1.4; }
+      .wd-hero .wm-title { font-size: 0.65rem; font-weight: 700; color: #ccc; }
+      .wd-hero .wm-sub { font-size: 0.5rem; color: #444; }
+      .wd-hero .wm-divider { height: 1px; background: rgba(255,255,255,0.04); }
+      .wd-hero .wm-avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; flex-shrink: 0; }
+      .wd-hero .wm-badge { padding: 1px 5px; border-radius: 6px; font-size: 0.45rem; font-weight: 600; }
+      .wd-hero .wm-row { display: flex; align-items: center; gap: 6px; }
+      .wd-hero .wm-col { display: flex; flex-direction: column; gap: 2px; }
+      .wd-hero .wm-progress { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.04); overflow: hidden; }
+      .wd-hero .wm-progress-fill { height: 100%; border-radius: 2px; }
+
+      /* Focus overlay (within container) */
+      .wd-focus-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        background: rgba(6,6,11,0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s ease;
+      }
+      .wd-focus-overlay.wd-focus-active { opacity: 1; pointer-events: auto; }
+
+      .wd-focus-card {
+        max-width: 440px;
+        width: 90%;
+        border-radius: 16px;
+        border: 1px solid #252538;
+        background: #111119;
+        overflow: hidden;
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        max-height: 90%;
+        overflow-y: auto;
+      }
+      .wd-focus-overlay.wd-focus-active .wd-focus-card { transform: scale(1) translateY(0); }
+
+      .wd-focus-header { padding: 16px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #1a1a28; }
+      .wd-focus-el-tile {
+        width: 52px; height: 58px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid rgba(255,255,255,0.08);
+        position: relative;
+      }
+      .wd-focus-el-tile .wd-el-w { position: absolute; top: 4px; left: 6px; font-size: 0.45rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; opacity: 0.5; }
+      .wd-focus-el-tile .wd-el-sym { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+      .wd-focus-el-tile .wd-el-name { font-size: 0.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-top: 2px; }
+
+      .wd-focus-info { flex: 1; }
+      .wd-focus-info h3 { font-size: 1rem; font-weight: 800; margin: 0 0 2px; color: #e4e4ef; }
+      .wd-focus-info .wd-focus-cat { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+      .wd-focus-info .wd-focus-desc { font-size: 0.65rem; color: #6b6b80; line-height: 1.5; margin: 0; }
+
+      .wd-focus-close {
+        position: absolute;
+        top: 12px; right: 14px;
+        width: 28px; height: 28px;
+        border-radius: 6px;
+        border: 1px solid #1a1a28;
+        background: transparent;
+        color: #6b6b80;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .wd-focus-close:hover { background: rgba(255,255,255,0.04); color: #e4e4ef; }
+
+      .wd-focus-meta { display: flex; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #1a1a28; }
+      .wd-focus-meta-item { text-align: center; }
+      .wd-focus-meta-label { font-size: 0.45rem; text-transform: uppercase; letter-spacing: 0.1em; color: #3a3a4f; margin-bottom: 2px; }
+      .wd-focus-meta-value { font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #e4e4ef; }
+      .wd-focus-comp { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 20px; }
+      .wd-comp-pill { display: flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 0.55rem; border: 1px solid #1a1a28; background: rgba(255,255,255,0.015); color: #e4e4ef; }
+      .wd-comp-pill-sym { font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+      .wd-focus-body { padding: 16px 20px; }
+
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .wd-hero { height: 400px; border-radius: 8px; }
+        .wd-grid { grid-template-columns: 1fr; }
+        .wd-header { flex-direction: column; gap: 8px; align-items: flex-start; padding: 14px 16px 10px; }
+        .wd-filters { gap: 6px; flex-wrap: wrap; }
+        .wd-filter { padding: 8px 14px; font-size: 0.75rem; min-height: 36px; }
+      }
+      @media (max-width: 480px) {
+        .wd-hero { height: 320px; }
+        .wd-header { padding: 10px 12px 8px; gap: 6px; }
+        .wd-filter { padding: 6px 10px; font-size: 0.7rem; min-height: 32px; }
+      }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   </head>
 
   <body>
@@ -58,13 +341,6 @@
         <p>Case Study 03</p>
       </header>
 
-      <!-- Governed Hero Media Slot -->
-      <section aria-label="Hero image">
-        <div aria-label="Hero image">
-          <img src="/assets/images/_Hero_Image_9.png" alt="Widget Drawer hero image" />
-        </div>
-      </section>
-
       <!-- Context -->
       <section aria-labelledby="context">
         <h2 id="context" class="section-hero-title">Overview</h2>
@@ -75,6 +351,7 @@
           evolved to extend into mobility contexts.
         </p>
       </section>
+
       <!-- Problem -->
       <section aria-labelledby="problem">
         <h2 id="problem">Role</h2>
@@ -85,6 +362,44 @@
           third-party adoption and monetization pathways.
         </p>
       </section>
+
+      <!-- Interactive Widget Drawer Hero -->
+      <section class="wd-hero" aria-label="Interactive widget drawer demo">
+        <!-- Header -->
+        <div class="wd-header">
+          <div class="wd-header-left">
+            <h2 class="wd-title">Widget Drawer <span class="wd-title-badge">10 Components</span></h2>
+            <p class="wd-subtitle">Atomic Design System &middot; Interactive Library</p>
+          </div>
+          <div class="wd-filters" id="wdFilterBar">
+            <button class="wd-filter wd-active" data-filter="all">All</button>
+            <button class="wd-filter" data-filter="inputs">Inputs</button>
+            <button class="wd-filter" data-filter="feedback">Feedback</button>
+            <button class="wd-filter" data-filter="layout">Layout</button>
+            <button class="wd-filter" data-filter="navigation">Nav</button>
+            <button class="wd-filter" data-filter="overlay">Overlay</button>
+            <button class="wd-filter" data-filter="display">Display</button>
+          </div>
+        </div>
+
+        <!-- Scrollable widget grid -->
+        <div class="wd-body" id="wdBody">
+          <div class="wd-grid" id="wdGrid"></div>
+        </div>
+
+        <!-- Focus overlay -->
+        <div class="wd-focus-overlay" id="wdFocusOverlay">
+          <div class="wd-focus-card" id="wdFocusCard">
+            <button class="wd-focus-close" id="wdFocusClose">&times;</button>
+            <div class="wd-focus-header" id="wdFocusHeader"></div>
+            <div class="wd-focus-meta" id="wdFocusMeta"></div>
+            <div class="wd-focus-comp" id="wdFocusComp"></div>
+            <div class="wd-focus-body" id="wdFocusBody"></div>
+          </div>
+        </div>
+
+      </section>
+
       <!-- Approach -->
       <section aria-labelledby="approach">
         <h2 id="approach">System / Work</h2>
@@ -153,5 +468,227 @@
 
     <!-- Client-side includes script -->
     <script src="/_includes.js" defer></script>
+
+    <!-- Widget Drawer Interactive Script -->
+    <script>
+    (function() {
+      var widgets = [
+        { symbol:'Bt', weight:2, name:'Button', cat:'inputs', color:'#f43f5e',
+          desc:'Interactive trigger combining label + optional icon. The primary call-to-action atom.',
+          level:'Molecule', children:2, composition:['Ic','Tx'],
+          content:'<div class="wm-col" style="gap:8px;padding-top:2px">' +
+            '<div class="wm-row" style="gap:6px"><div class="wm-btn" style="background:rgba(244,63,94,0.15);color:#f43f5e">Primary</div><div class="wm-btn" style="background:rgba(244,63,94,0.08);color:#f43f5e;opacity:0.6">Secondary</div></div>' +
+            '<div class="wm-row" style="gap:6px"><div class="wm-btn-ghost">Ghost</div><div class="wm-btn" style="background:rgba(255,255,255,0.04);color:#555;border:1px solid rgba(255,255,255,0.06)">Outline</div></div>' +
+            '<div class="wm-row" style="gap:6px;margin-top:2px"><div class="wm-btn" style="background:rgba(244,63,94,0.15);color:#f43f5e;padding:6px 14px;border-radius:8px;font-size:0.6rem">&#9654; Get Started</div></div></div>' },
+        { symbol:'Ts', weight:3, name:'Toast', cat:'feedback', color:'#8b5cf6',
+          desc:'Ephemeral notification. Auto-dismissing message bar with icon and action.',
+          level:'Compound', children:3, composition:['Ic','Tx','Bt'], fullWidth:true,
+          content:'<div class="wm-col" style="gap:6px">' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><span style="font-size:0.55rem;color:#10b981;font-weight:500;flex:1">Changes saved</span><span style="color:#10b98144;font-size:0.8rem">&times;</span></div>' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span style="font-size:0.55rem;color:#f43f5e;font-weight:500;flex:1">Upload failed</span><span style="font-size:0.5rem;color:#f43f5e88;font-weight:600">Retry</span></div>' +
+            '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span style="font-size:0.55rem;color:#f59e0b;font-weight:500;flex:1">Storage 92%</span><span style="font-size:0.5rem;color:#f59e0b88;font-weight:600">Upgrade</span></div></div>' },
+        { symbol:'In', weight:3, name:'Input', cat:'inputs', color:'#f43f5e',
+          desc:'Text entry field with label, placeholder, and validation.',
+          level:'Compound', children:3, composition:['Lb','Tx','Ic'],
+          content:'<div class="wm-col" style="gap:8px;padding-top:2px">' +
+            '<div class="wm-col" style="gap:2px"><div class="wm-label">Username</div><div class="wm-input">pej_aryanpour</div></div>' +
+            '<div class="wm-col" style="gap:2px"><div class="wm-label">Email</div><div class="wm-input" style="border-color:rgba(16,185,129,0.2)">pej@example.com <span style="float:right;color:#10b981">&#10003;</span></div></div>' +
+            '<div class="wm-col" style="gap:2px"><div class="wm-label" style="color:rgba(244,63,94,0.6)">Password</div><div class="wm-input" style="border-color:rgba(244,63,94,0.2)">&bull;&bull;&bull;</div><div style="font-size:0.45rem;color:#f43f5e88">Min 8 characters</div></div></div>' },
+        { symbol:'Cd', weight:4, name:'Card', cat:'layout', color:'#06b6d4',
+          desc:'Content container with image, title, body, and actions.',
+          level:'Complex', children:4, composition:['Im','Tx','Bt','Dv'], fullWidth:true,
+          content:'<div style="border-radius:8px;background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(99,102,241,0.05));height:50px;display:flex;align-items:center;justify-content:center;margin-bottom:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>' +
+            '<div class="wm-title" style="font-size:0.6rem">Analytics Overview</div>' +
+            '<div class="wm-text" style="margin:4px 0 8px;font-size:0.5rem">Revenue up 23% from last quarter.</div>' +
+            '<div class="wm-row" style="gap:4px"><div class="wm-btn" style="background:rgba(6,182,212,0.12);color:#06b6d4;font-size:0.5rem">View</div><div class="wm-btn-ghost" style="font-size:0.5rem">Dismiss</div></div>' },
+        { symbol:'Av', weight:2, name:'Avatar', cat:'display', color:'#f59e0b',
+          desc:'Identity thumbnail. Image or initials representing a user entity.',
+          level:'Molecule', children:2, composition:['Im','Tx'],
+          content:'<div class="wm-col" style="gap:8px;padding-top:2px">' +
+            '<div class="wm-row" style="gap:6px"><div class="wm-avatar" style="background:rgba(244,63,94,0.15);color:#f43f5e;width:26px;height:26px;font-size:0.5rem">PJ</div><div class="wm-avatar" style="background:rgba(99,102,241,0.15);color:#6366f1;width:26px;height:26px;font-size:0.5rem">AK</div><div class="wm-avatar" style="background:rgba(16,185,129,0.15);color:#10b981;width:26px;height:26px;font-size:0.5rem">MR</div><div class="wm-avatar" style="background:rgba(236,72,153,0.15);color:#ec4899;width:26px;height:26px;font-size:0.5rem">JL</div></div>' +
+            '<div class="wm-row" style="gap:6px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)"><div class="wm-avatar" style="background:rgba(245,158,11,0.15);color:#f59e0b">PJ</div><div class="wm-col" style="gap:0"><span style="font-size:0.55rem;font-weight:600;color:#bbb">Pej Aryanpour</span><span style="font-size:0.45rem;color:#444">Online</span></div><div style="width:6px;height:6px;border-radius:50%;background:#10b981;margin-left:auto;box-shadow:0 0 4px rgba(16,185,129,0.4)"></div></div></div>' },
+        { symbol:'Pg', weight:3, name:'Progress', cat:'feedback', color:'#8b5cf6',
+          desc:'Determinate loading bar. Visualizes completion percentage.',
+          level:'Compound', children:2, composition:['Tx','Lb'],
+          content:'<div class="wm-col" style="gap:10px;padding-top:2px">' +
+            '<div class="wm-col" style="gap:4px"><div class="wm-row" style="justify-content:space-between"><span class="wm-label">Upload</span><span style="font-size:0.45rem;font-family:\'JetBrains Mono\',monospace;color:#8b5cf6">73%</span></div><div class="wm-progress"><div class="wm-progress-fill" style="width:73%;background:linear-gradient(90deg,#8b5cf6,#6366f1)"></div></div></div>' +
+            '<div class="wm-col" style="gap:4px"><div class="wm-row" style="justify-content:space-between"><span class="wm-label">Storage</span><span style="font-size:0.45rem;font-family:\'JetBrains Mono\',monospace;color:#f59e0b">92%</span></div><div class="wm-progress"><div class="wm-progress-fill" style="width:92%;background:linear-gradient(90deg,#f59e0b,#f43f5e)"></div></div></div>' +
+            '<div class="wm-col" style="gap:4px"><div class="wm-row" style="justify-content:space-between"><span class="wm-label">Sync</span><span style="font-size:0.45rem;font-family:\'JetBrains Mono\',monospace;color:#10b981">100%</span></div><div class="wm-progress"><div class="wm-progress-fill" style="width:100%;background:#10b981"></div></div></div></div>' },
+        { symbol:'Tb', weight:3, name:'Tabs', cat:'navigation', color:'#10b981',
+          desc:'Section switcher. Horizontal tab bar controlling visible content panels.',
+          level:'Compound', children:3, composition:['Bt','Ic','Tx'], fullWidth:true,
+          content:'<div class="wm-col" style="gap:8px">' +
+            '<div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.05)"><div style="padding:5px 10px;font-size:0.55rem;font-weight:600;color:#10b981;border-bottom:2px solid #10b981;margin-bottom:-1px">Overview</div><div style="padding:5px 10px;font-size:0.55rem;color:#555">Analytics</div><div style="padding:5px 10px;font-size:0.55rem;color:#555">Settings</div><div style="padding:5px 10px;font-size:0.55rem;color:#555">Logs</div></div>' +
+            '<div class="wm-text" style="font-size:0.5rem">Currently viewing the Overview panel.</div>' +
+            '<div style="display:flex;gap:4px;flex-wrap:wrap"><div style="padding:4px 8px;border-radius:6px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.1);font-size:0.45rem;color:#10b981">Users: 1,234</div><div style="padding:4px 8px;border-radius:6px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.1);font-size:0.45rem;color:#6366f1">$48.2k</div></div></div>' },
+        { symbol:'Md', weight:5, name:'Modal', cat:'overlay', color:'#ec4899',
+          desc:'Focus-stealing dialog. Full overlay with header, body, and action footer.',
+          level:'Organism', children:5, composition:['Tx','Bt','Ic','Dv','In'], fullWidth:true,
+          content:'<div style="border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.015);padding:10px;display:flex;flex-direction:column;gap:8px">' +
+            '<div class="wm-row" style="justify-content:space-between"><span class="wm-title" style="font-size:0.6rem">Delete Project?</span><span style="color:#333;font-size:0.8rem">&times;</span></div>' +
+            '<div class="wm-divider"></div>' +
+            '<div class="wm-text" style="font-size:0.5rem">Permanently removes all data. Cannot be undone.</div>' +
+            '<div class="wm-row" style="gap:6px;margin-top:2px"><div class="wm-btn-ghost" style="flex:1;text-align:center;display:flex;justify-content:center;font-size:0.5rem">Cancel</div><div class="wm-btn" style="background:rgba(236,72,153,0.15);color:#ec4899;flex:1;justify-content:center;font-size:0.5rem">Delete</div></div></div>' },
+        { symbol:'Bg', weight:2, name:'Badge', cat:'feedback', color:'#8b5cf6',
+          desc:'Compact status indicator. Overlays a count or label on its parent.',
+          level:'Molecule', children:2, composition:['Ic','Tx'],
+          content:'<div class="wm-col" style="gap:8px;padding-top:2px">' +
+            '<div class="wm-row" style="gap:6px;flex-wrap:wrap"><span class="wm-badge" style="background:rgba(139,92,246,0.12);color:#8b5cf6">New</span><span class="wm-badge" style="background:rgba(16,185,129,0.12);color:#10b981">Active</span><span class="wm-badge" style="background:rgba(244,63,94,0.12);color:#f43f5e">Urgent</span><span class="wm-badge" style="background:rgba(245,158,11,0.12);color:#f59e0b">Pending</span><span class="wm-badge" style="background:rgba(6,182,212,0.12);color:#06b6d4">Info</span></div>' +
+            '<div class="wm-divider"></div>' +
+            '<div class="wm-row" style="gap:8px"><div style="position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span style="position:absolute;top:-3px;right:-5px;background:#f43f5e;color:white;font-size:0.35rem;width:10px;height:10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">3</span></div><div style="position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span style="position:absolute;top:-3px;right:-5px;background:#8b5cf6;color:white;font-size:0.35rem;width:10px;height:10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">7</span></div></div></div>' },
+        { symbol:'Tl', weight:5, name:'Table', cat:'display', color:'#f59e0b',
+          desc:'Tabular data grid. Sortable, filterable rows and columns.',
+          level:'Organism', children:5, composition:['Tx','Bt','Ic','Bg','Pg'], fullWidth:true,
+          content:'<div class="wm-col" style="gap:0">' +
+            '<div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 0.8fr;padding:4px 0 6px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.4rem;text-transform:uppercase;letter-spacing:0.08em;color:#333"><span>Name</span><span>Role</span><span>Status</span><span>Action</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 0.8fr;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.02);align-items:center;font-size:0.5rem"><div class="wm-row" style="gap:4px"><div class="wm-avatar" style="width:14px;height:14px;background:rgba(99,102,241,0.15);font-size:0.35rem;color:#6366f1">PJ</div><span style="color:#bbb">Pej A.</span></div><span style="color:#555">Admin</span><span class="wm-badge" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:0.4rem">Active</span><span style="color:#333;font-size:0.45rem">Edit</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 0.8fr;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.02);align-items:center;font-size:0.5rem"><div class="wm-row" style="gap:4px"><div class="wm-avatar" style="width:14px;height:14px;background:rgba(236,72,153,0.15);font-size:0.35rem;color:#ec4899">AK</div><span style="color:#bbb">A. Kim</span></div><span style="color:#555">Editor</span><span class="wm-badge" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:0.4rem">Active</span><span style="color:#333;font-size:0.45rem">Edit</span></div>' +
+            '<div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 0.8fr;padding:6px 0;align-items:center;font-size:0.5rem"><div class="wm-row" style="gap:4px"><div class="wm-avatar" style="width:14px;height:14px;background:rgba(245,158,11,0.15);font-size:0.35rem;color:#f59e0b">MR</div><span style="color:#bbb">M. Rivera</span></div><span style="color:#555">Viewer</span><span class="wm-badge" style="background:rgba(245,158,11,0.1);color:#f59e0b;font-size:0.4rem">Pending</span><span style="color:#333;font-size:0.45rem">Edit</span></div></div>' }
+      ];
+
+      var grid = document.getElementById('wdGrid');
+      var focusOverlay = document.getElementById('wdFocusOverlay');
+      var selectedIndex = 0;
+      var focusedWidget = null;
+      var cardElements = [];
+      var visibleIndices = [];
+
+      // Build widget cards
+      widgets.forEach(function(w, i) {
+        var card = document.createElement('div');
+        card.className = 'wd-card';
+        card.dataset.index = i;
+        card.dataset.cat = w.cat;
+        card.style.setProperty('--wd-cat-color', w.color);
+        card.style.setProperty('--wd-cat-glow', w.color + '15');
+
+        var bodyClass = w.fullWidth ? 'wd-card-body wd-full' : 'wd-card-body';
+
+        card.innerHTML =
+          '<div class="wd-el-tile" style="background:' + w.color + '0a;border-color:' + w.color + '18">' +
+            '<span class="wd-el-w" style="color:' + w.color + '">' + w.weight + '</span>' +
+            '<span class="wd-el-sym" style="color:' + w.color + '">' + w.symbol + '</span>' +
+            '<span class="wd-el-name">' + w.name + '</span>' +
+          '</div>' +
+          '<div class="' + bodyClass + '">' + w.content + '</div>' +
+          '<div class="wd-watermark" style="color:' + w.color + '">' + w.symbol + '</div>';
+
+        card.addEventListener('click', function() { openFocus(i); });
+        cardElements.push(card);
+        grid.appendChild(card);
+      });
+      visibleIndices = widgets.map(function(_, i) { return i; });
+
+      // Select first card on load
+      selectCard(0);
+
+      function selectCard(index) {
+        selectedIndex = index;
+        cardElements.forEach(function(c, ci) {
+          if (ci === index) {
+            c.classList.add('wd-selected');
+            c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            c.classList.remove('wd-selected');
+          }
+        });
+      }
+
+      // Focus overlay
+      function openFocus(index) {
+        var w = widgets[index];
+        focusedWidget = index;
+        selectCard(index);
+
+        document.getElementById('wdFocusHeader').innerHTML =
+          '<div class="wd-focus-el-tile" style="background:' + w.color + '0a;border-color:' + w.color + '20">' +
+            '<span class="wd-el-w" style="color:' + w.color + '">' + w.weight + '</span>' +
+            '<span class="wd-el-sym" style="color:' + w.color + '">' + w.symbol + '</span>' +
+            '<span class="wd-el-name">' + w.name + '</span>' +
+          '</div>' +
+          '<div class="wd-focus-info">' +
+            '<h3 style="color:' + w.color + '">' + w.name + '</h3>' +
+            '<div class="wd-focus-cat" style="color:' + w.color + '88">' + w.cat + '</div>' +
+            '<p class="wd-focus-desc">' + w.desc + '</p>' +
+          '</div>';
+
+        document.getElementById('wdFocusMeta').innerHTML =
+          '<div class="wd-focus-meta-item"><div class="wd-focus-meta-label">Weight</div><div class="wd-focus-meta-value" style="color:' + w.color + '">' + w.weight + '</div></div>' +
+          '<div class="wd-focus-meta-item"><div class="wd-focus-meta-label">Level</div><div class="wd-focus-meta-value">' + w.level + '</div></div>' +
+          '<div class="wd-focus-meta-item"><div class="wd-focus-meta-label">Children</div><div class="wd-focus-meta-value">' + w.children + '</div></div>';
+
+        document.getElementById('wdFocusComp').innerHTML = w.composition.map(function(sym) {
+          var found = widgets.find(function(x) { return x.symbol === sym; });
+          var c = found ? found.color : '#555';
+          var n = found ? found.name : sym;
+          return '<div class="wd-comp-pill"><span class="wd-comp-pill-sym" style="color:' + c + '">' + sym + '</span>' + n + '</div>';
+        }).join('');
+
+        document.getElementById('wdFocusBody').innerHTML = w.content;
+        document.getElementById('wdFocusCard').style.borderColor = w.color + '30';
+        focusOverlay.classList.add('wd-focus-active');
+      }
+
+      function closeFocus() {
+        focusedWidget = null;
+        focusOverlay.classList.remove('wd-focus-active');
+      }
+
+      document.getElementById('wdFocusClose').addEventListener('click', closeFocus);
+      focusOverlay.addEventListener('click', function(e) {
+        if (e.target === focusOverlay) closeFocus();
+      });
+
+      // Keyboard
+      document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'Escape' && focusedWidget !== null) { closeFocus(); return; }
+
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          if (focusedWidget !== null) closeFocus();
+          var pos = visibleIndices.indexOf(selectedIndex);
+          var next = pos < visibleIndices.length - 1 ? pos + 1 : 0;
+          selectCard(visibleIndices[next]);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          if (focusedWidget !== null) closeFocus();
+          var pos = visibleIndices.indexOf(selectedIndex);
+          var prev = pos > 0 ? pos - 1 : visibleIndices.length - 1;
+          selectCard(visibleIndices[prev]);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (selectedIndex >= 0 && focusedWidget === null) openFocus(selectedIndex);
+        }
+      });
+
+      // Filters
+      document.querySelectorAll('.wd-filter').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.wd-filter').forEach(function(b) { b.classList.remove('wd-active'); });
+          btn.classList.add('wd-active');
+          var filter = btn.dataset.filter;
+
+          visibleIndices = [];
+          cardElements.forEach(function(card, i) {
+            if (filter === 'all' || widgets[i].cat === filter) {
+              card.classList.remove('wd-dimmed');
+              card.style.display = '';
+              visibleIndices.push(i);
+            } else {
+              card.classList.add('wd-dimmed');
+              card.style.display = 'none';
+            }
+          });
+
+          if (visibleIndices.length > 0 && visibleIndices.indexOf(selectedIndex) === -1) {
+            selectCard(visibleIndices[0]);
+          }
+        });
+      });
+    })();
+    </script>
+
   </body>
 </html>

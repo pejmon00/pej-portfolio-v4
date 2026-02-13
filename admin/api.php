@@ -375,6 +375,7 @@ switch ($action) {
             'title' => $input['title'],
             'images' => $input['images'] ?? [],
             'order' => intval($input['order'] ?? (count($gallery) + 1)),
+            'category' => $input['category'] ?? 'product',
         ];
         $gallery[] = $newProject;
         writeJson('gallery.json', $gallery);
@@ -392,6 +393,7 @@ switch ($action) {
             if ($project['id'] === $id) {
                 $project['title'] = $input['title'] ?? $project['title'];
                 $project['order'] = intval($input['order'] ?? $project['order']);
+                $project['category'] = $input['category'] ?? $project['category'] ?? 'product';
                 if (isset($input['images'])) {
                     $project['images'] = $input['images'];
                 }
@@ -404,6 +406,46 @@ switch ($action) {
         writeJson('gallery.json', $gallery);
         Renderer::renderGalleryPage();
         respond(true, 'Gallery project updated and published.');
+        break;
+
+    case 'reorder_gallery_project':
+        $id = intval($_POST['id'] ?? 0);
+        $direction = intval($_POST['direction'] ?? 0); // -1 = up, 1 = down
+        if (!$id || !$direction) respond(false, 'Invalid reorder request.');
+        $gallery = readJson('gallery.json');
+        // Group by category, reorder within category
+        $byCategory = [];
+        foreach ($gallery as $project) {
+            $cat = $project['category'] ?? 'product';
+            $byCategory[$cat][] = $project;
+        }
+        foreach ($byCategory as $cat => &$items) {
+            usort($items, function ($a, $b) { return ($a['order'] ?? 0) - ($b['order'] ?? 0); });
+            // Find the project in this group
+            $idx = -1;
+            foreach ($items as $i => $item) {
+                if ($item['id'] === $id) { $idx = $i; break; }
+            }
+            if ($idx === -1) continue;
+            $newIdx = $idx + $direction;
+            if ($newIdx < 0 || $newIdx >= count($items)) continue;
+            // Swap
+            $temp = $items[$idx];
+            $items[$idx] = $items[$newIdx];
+            $items[$newIdx] = $temp;
+            // Re-assign order values
+            foreach ($items as $i => &$item) { $item['order'] = $i + 1; }
+            unset($item);
+        }
+        unset($items);
+        // Flatten back
+        $gallery = [];
+        foreach ($byCategory as $items) {
+            foreach ($items as $item) { $gallery[] = $item; }
+        }
+        writeJson('gallery.json', $gallery);
+        Renderer::renderGalleryPage();
+        respond(true, 'Gallery order updated.');
         break;
 
     case 'delete_gallery_project':

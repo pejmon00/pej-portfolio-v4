@@ -84,6 +84,10 @@
         <input type="text" id="page-home-heroTitle">
       </div>
       <div class="form-group">
+        <label for="page-home-heroSubtitle">Hero Subtitle</label>
+        <input type="text" id="page-home-heroSubtitle">
+      </div>
+      <div class="form-group">
         <label for="page-home-heroText">Hero Text</label>
         <textarea id="page-home-heroText" rows="3"></textarea>
       </div>
@@ -99,6 +103,33 @@
           </div>
         </div>
       </div>
+      <hr style="margin:20px 0;">
+      <h3>CTA Cards</h3>
+      <div class="form-group">
+        <label for="page-home-cta1Title">CTA 1 Title</label>
+        <input type="text" id="page-home-cta1Title">
+      </div>
+      <div class="form-group">
+        <label for="page-home-cta1Desc">CTA 1 Description</label>
+        <input type="text" id="page-home-cta1Desc">
+      </div>
+      <div class="form-group">
+        <label for="page-home-cta1Link">CTA 1 Link</label>
+        <input type="text" id="page-home-cta1Link">
+      </div>
+      <div class="form-group">
+        <label for="page-home-cta2Title">CTA 2 Title</label>
+        <input type="text" id="page-home-cta2Title">
+      </div>
+      <div class="form-group">
+        <label for="page-home-cta2Desc">CTA 2 Description</label>
+        <input type="text" id="page-home-cta2Desc">
+      </div>
+      <div class="form-group">
+        <label for="page-home-cta2Link">CTA 2 Link</label>
+        <input type="text" id="page-home-cta2Link">
+      </div>
+      <hr style="margin:20px 0;">
       <div class="form-group">
         <label>Services Image</label>
         <div class="image-field">
@@ -111,6 +142,45 @@
           </div>
         </div>
       </div>
+      <hr style="margin:20px 0;">
+      <h3>Credibility Logos</h3>
+      <div class="form-group">
+        <label>Logo 1</label>
+        <div class="image-field">
+          <input type="hidden" id="page-home-logo1">
+          <img class="image-field__preview" src="" alt="Preview">
+          <div class="image-field__actions">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="Admin.openImagePicker('page-home-logo1')">Choose Image</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="Admin.clearImageField('page-home-logo1')">Remove</button>
+            <span class="image-field__path"></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Logo 2</label>
+        <div class="image-field">
+          <input type="hidden" id="page-home-logo2">
+          <img class="image-field__preview" src="" alt="Preview">
+          <div class="image-field__actions">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="Admin.openImagePicker('page-home-logo2')">Choose Image</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="Admin.clearImageField('page-home-logo2')">Remove</button>
+            <span class="image-field__path"></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Logo 3</label>
+        <div class="image-field">
+          <input type="hidden" id="page-home-logo3">
+          <img class="image-field__preview" src="" alt="Preview">
+          <div class="image-field__actions">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="Admin.openImagePicker('page-home-logo3')">Choose Image</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="Admin.clearImageField('page-home-logo3')">Remove</button>
+            <span class="image-field__path"></span>
+          </div>
+        </div>
+      </div>
+      <hr style="margin:20px 0;">
       <div class="form-group">
         <label for="page-home-aboutTitle">About Title</label>
         <input type="text" id="page-home-aboutTitle">
@@ -223,7 +293,16 @@
           </div>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="Admin.savePage('gallery')">Save &amp; Publish</button>
+      <hr style="margin:20px 0;">
+      <h3>Gallery Sections</h3>
+      <p style="font-size:13px;color:var(--admin-text-secondary);margin:0 0 12px;">
+        Each section appears as a titled gallery grid with its own page navigation link. Gallery projects are assigned to a section via their Category.
+      </p>
+      <div id="gallery-sections-list"></div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addGallerySection()" style="margin-top:8px;">+ Add Section</button>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="Admin.savePage('gallery')">Save &amp; Publish</button>
+      </div>
     </div>
   </div>
 </div>
@@ -253,6 +332,11 @@
       <div class="form-group">
         <label for="gp-title">Project Title</label>
         <input type="text" id="gp-title" required>
+      </div>
+      <div class="form-group">
+        <label for="gp-category">Category</label>
+        <select id="gp-category">
+        </select>
       </div>
       <div class="form-group">
         <label for="gp-order">Order</label>

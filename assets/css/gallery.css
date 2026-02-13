@@ -7,6 +7,10 @@
   margin-top: var(--space-4);
 }
 
+.gallery-section:last-of-type {
+  min-height: 80vh;
+}
+
 .gallery-section h2 {
   margin-bottom: var(--space-1);
 }
@@ -53,6 +57,20 @@
   height: auto;
   border-radius: var(--radius-2);
   object-fit: cover;
+}
+
+/* ---------- placeholder card ---------- */
+.gallery-project__cover--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 10;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-2);
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 0.02em;
 }
 
 /* ---------- per-project thumbnail strip ---------- */

@@ -34,7 +34,8 @@
                 "description": "Form Factor "
             }
         ],
-        "order": 1
+        "order": 1,
+        "category": "product"
     },
     {
         "id": 2,
@@ -66,7 +67,8 @@
                 "description": "Design System Development"
             }
         ],
-        "order": 1
+        "order": 1,
+        "category": "product"
     },
     {
         "id": 3,
@@ -103,7 +105,8 @@
                 "description": "Design System"
             }
         ],
-        "order": 1
+        "order": 1,
+        "category": "product"
     },
     {
         "id": 4,
@@ -130,6 +133,7 @@
                 "description": "Agile"
             }
         ],
-        "order": 1
+        "order": 1,
+        "category": "product"
     }
 ]

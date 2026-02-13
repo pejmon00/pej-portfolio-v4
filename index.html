@@ -56,38 +56,35 @@
       <div id="about-top" aria-hidden="true"></div>
       <!-- HERO -->
       <header aria-labelledby="hero-title">
-        <!-- editable:heroTitle --><h1 id="hero-title">My name is Pej</h1><!-- /editable:heroTitle -->
-        <!-- editable:heroText --><p>I work on complex systems where clarity matters. These are systems people rely on every day—where decisions have consequences and durability matters more than novelty.</p><!-- /editable:heroText -->
-        <!-- Hero image placeholder (governed slot) -->
+        <!-- editable:heroTitle --><h1 id="hero-title">Principal Product Designer</h1><!-- /editable:heroTitle -->
+        <!-- editable:heroSubtitle --><h4>systems, multimodal, and platform UX.</h4><!-- /editable:heroSubtitle -->
+        <!-- editable:heroText --><p>I build durable interaction frameworks teams can ship, govern, and scale—especially where decisions carry consequences.</p><!-- /editable:heroText -->
         <div aria-label="Hero image">
           <!-- editable:heroImage --><img src="/assets/images/My-headshot.jpg" alt="Portrait of Pej Vosooghi" /><!-- /editable:heroImage -->
         </div>
       </header>
 
       <!-- CREDIBILITY / LOGOS -->
-      <section aria-labelledby="credibility-title">
-        <h2 id="credibility-title">Environments that shaped my thinking</h2>
-
+      <div class="hero-logos">
         <div aria-label="Company logos">
-          <!-- Logo 1 -->
-          <img
-            src="/assets/images/Company logo.png"
-            alt="Company logo placeholder"
-          />
-
-          <!-- Logo 2 -->
-          <img
-            src="/assets/images/Company logo-1.png"
-            alt="Company logo placeholder"
-          />
-
-          <!-- Logo 3 -->
-          <img
-            src="/assets/images/Company logo-2.png"
-            alt="Company logo placeholder"
-          />
+          <!-- editable:logo1 --><img src="/assets/images/Company logo.png" alt="Company logo" /><!-- /editable:logo1 -->
+          <!-- editable:logo2 --><img src="/assets/images/Company logo-1.png" alt="Company logo" /><!-- /editable:logo2 -->
+          <!-- editable:logo3 --><img src="/assets/images/Company logo-2.png" alt="Company logo" /><!-- /editable:logo3 -->
         </div>
-      </section>
+      </div>
+
+      <!-- editable:heroCards --><div class="hero-cards">
+        <a href="/experience" class="hero-card">
+          <span class="hero-card__title">Case Studies</span>
+          <span class="hero-card__desc">Systems work, outcomes &amp; process</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="/gallery" class="hero-card">
+          <span class="hero-card__title">Gallery</span>
+          <span class="hero-card__desc">Visual work &amp; selected outputs</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div><!-- /editable:heroCards -->
 
       <!-- ABOUT -->
       <section aria-labelledby="about-title">
@@ -112,7 +109,7 @@
       </section>
 
       <!-- SERVICES (embedded on Home) -->
-      <section aria-labelledby="services-title" style="margin-top: var(--space-8);">
+      <section aria-labelledby="services-title">
         <hr class="section-divider" aria-hidden="true" />
         <h2 class="section-hero-title" id="services-title">Services / Consultation</h2>
         <p>Working with teams and individuals</p>

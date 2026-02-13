@@ -18,6 +18,444 @@
     <link rel="stylesheet" href="/assets/css/secondaryNavMobile.css" />
     <script src="/assets/js/secondaryNavMobile.js" defer></script>
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+
+    <style>
+      /* ── Periodic Table Hero (scoped) ── */
+      .pt-hero {
+        --pt-bg: #0a0a0f;
+        --pt-surface: #12121a;
+        --pt-border: #1e1e2e;
+        --pt-text: #e4e4ef;
+        --pt-text-dim: #6b6b80;
+        --pt-text-muted: #3a3a4f;
+
+        --pt-primitives: #6366f1;
+        --pt-primitives-bg: rgba(99,102,241,0.08);
+        --pt-primitives-glow: rgba(99,102,241,0.3);
+        --pt-inputs: #f43f5e;
+        --pt-inputs-bg: rgba(244,63,94,0.08);
+        --pt-inputs-glow: rgba(244,63,94,0.3);
+        --pt-display: #f59e0b;
+        --pt-display-bg: rgba(245,158,11,0.08);
+        --pt-display-glow: rgba(245,158,11,0.3);
+        --pt-navigation: #10b981;
+        --pt-navigation-bg: rgba(16,185,129,0.08);
+        --pt-navigation-glow: rgba(16,185,129,0.3);
+        --pt-feedback: #8b5cf6;
+        --pt-feedback-bg: rgba(139,92,246,0.08);
+        --pt-feedback-glow: rgba(139,92,246,0.3);
+        --pt-layout: #06b6d4;
+        --pt-layout-bg: rgba(6,182,212,0.08);
+        --pt-layout-glow: rgba(6,182,212,0.3);
+        --pt-overlay: #ec4899;
+        --pt-overlay-bg: rgba(236,72,153,0.08);
+        --pt-overlay-glow: rgba(236,72,153,0.3);
+
+        position: relative;
+        background: var(--pt-bg);
+        border-radius: 12px;
+        padding: 30px 20px;
+        margin: var(--space-4) 0;
+        overflow: hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--pt-text);
+      }
+
+      /* Background grid effect */
+      .pt-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .pt-hero::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #6366f1, #8b5cf6, #ec4899, #f43f5e, #f59e0b, #10b981, #06b6d4, transparent);
+        background-size: 300% 100%;
+        animation: ptShift 5s linear infinite;
+        opacity: 0.4;
+        z-index: 10;
+        filter: drop-shadow(0 0 6px rgba(139,92,246,0.15));
+      }
+      @keyframes ptShift { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+
+      .pt-hero > * { position: relative; z-index: 1; }
+
+      /* Header */
+      .pt-header { text-align: center; margin-bottom: 30px; }
+      .pt-header h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, #e4e4ef 0%, #6b6b80 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0 0 6px;
+      }
+      .pt-header .pt-subtitle {
+        font-size: 0.8rem;
+        color: var(--pt-text-dim);
+        font-weight: 400;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      /* Legend */
+      .pt-legend {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 30px;
+      }
+      .pt-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        color: var(--pt-text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        background: none;
+        border: none;
+        font-family: inherit;
+      }
+      .pt-legend-item:hover { background: rgba(255,255,255,0.04); }
+      .pt-legend-item.active { background: rgba(255,255,255,0.06); color: var(--pt-text); }
+      .pt-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+      /* Weight Scale */
+      .pt-weight-scale {
+        display: flex;
+        justify-content: center;
+        gap: 3px;
+        margin-bottom: 30px;
+      }
+      .pt-weight-block {
+        width: 56px;
+        padding: 6px 0;
+        text-align: center;
+        border-radius: 6px;
+        font-size: 0.6rem;
+        color: var(--pt-text-dim);
+        letter-spacing: 0.05em;
+        border: 1px solid var(--pt-border);
+        background: var(--pt-surface);
+      }
+      .pt-weight-block .pt-wb-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--pt-text);
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      /* Periodic Table Grid */
+      .pt-grid {
+        display: grid;
+        grid-template-columns: repeat(18, 1fr);
+        gap: 4px;
+      }
+
+      /* Tile */
+      .pt-tile {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        overflow: hidden;
+        background: none;
+        font-family: inherit;
+      }
+      .pt-tile::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .pt-tile:hover { transform: scale(1.15); z-index: 10; border-color: var(--pt-cat-color); }
+      .pt-tile:hover::before { opacity: 1; }
+
+      .pt-tile .pt-w {
+        position: absolute;
+        top: 3px; left: 5px;
+        font-size: 0.5rem;
+        font-weight: 600;
+        font-family: 'JetBrains Mono', monospace;
+        opacity: 0.6;
+        color: var(--pt-text);
+      }
+      .pt-tile .pt-sym {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 1px;
+      }
+      .pt-tile .pt-name {
+        font-size: 0.42rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.7;
+        text-align: center;
+        line-height: 1.2;
+        color: var(--pt-text);
+      }
+
+      /* Category styles */
+      .pt-tile.pt-primitives { background: var(--pt-primitives-bg); --pt-cat-color: var(--pt-primitives); }
+      .pt-tile.pt-primitives::before { background: radial-gradient(circle at center, var(--pt-primitives-glow), transparent 70%); }
+      .pt-tile.pt-primitives .pt-sym { color: var(--pt-primitives); }
+
+      .pt-tile.pt-inputs { background: var(--pt-inputs-bg); --pt-cat-color: var(--pt-inputs); }
+      .pt-tile.pt-inputs::before { background: radial-gradient(circle at center, var(--pt-inputs-glow), transparent 70%); }
+      .pt-tile.pt-inputs .pt-sym { color: var(--pt-inputs); }
+
+      .pt-tile.pt-display { background: var(--pt-display-bg); --pt-cat-color: var(--pt-display); }
+      .pt-tile.pt-display::before { background: radial-gradient(circle at center, var(--pt-display-glow), transparent 70%); }
+      .pt-tile.pt-display .pt-sym { color: var(--pt-display); }
+
+      .pt-tile.pt-navigation { background: var(--pt-navigation-bg); --pt-cat-color: var(--pt-navigation); }
+      .pt-tile.pt-navigation::before { background: radial-gradient(circle at center, var(--pt-navigation-glow), transparent 70%); }
+      .pt-tile.pt-navigation .pt-sym { color: var(--pt-navigation); }
+
+      .pt-tile.pt-feedback { background: var(--pt-feedback-bg); --pt-cat-color: var(--pt-feedback); }
+      .pt-tile.pt-feedback::before { background: radial-gradient(circle at center, var(--pt-feedback-glow), transparent 70%); }
+      .pt-tile.pt-feedback .pt-sym { color: var(--pt-feedback); }
+
+      .pt-tile.pt-layout { background: var(--pt-layout-bg); --pt-cat-color: var(--pt-layout); }
+      .pt-tile.pt-layout::before { background: radial-gradient(circle at center, var(--pt-layout-glow), transparent 70%); }
+      .pt-tile.pt-layout .pt-sym { color: var(--pt-layout); }
+
+      .pt-tile.pt-overlay { background: var(--pt-overlay-bg); --pt-cat-color: var(--pt-overlay); }
+      .pt-tile.pt-overlay::before { background: radial-gradient(circle at center, var(--pt-overlay-glow), transparent 70%); }
+      .pt-tile.pt-overlay .pt-sym { color: var(--pt-overlay); }
+
+      /* Empty cell */
+      .pt-empty { opacity: 0; pointer-events: none; }
+
+      /* Filter dimming */
+      .pt-tile.pt-dimmed { opacity: 0.08; transform: scale(0.95); pointer-events: none; }
+
+      /* Detail Panel — vars need to be on :root for fixed-positioned panel */
+      .pt-detail-panel,
+      .pt-overlay-bg {
+        --pt-bg: #0a0a0f;
+        --pt-surface: #12121a;
+        --pt-border: #1e1e2e;
+        --pt-text: #e4e4ef;
+        --pt-text-dim: #6b6b80;
+        --pt-text-muted: #3a3a4f;
+        --pt-primitives: #6366f1;
+        --pt-primitives-bg: rgba(99,102,241,0.08);
+        --pt-inputs: #f43f5e;
+        --pt-inputs-bg: rgba(244,63,94,0.08);
+        --pt-display: #f59e0b;
+        --pt-display-bg: rgba(245,158,11,0.08);
+        --pt-navigation: #10b981;
+        --pt-navigation-bg: rgba(16,185,129,0.08);
+        --pt-feedback: #8b5cf6;
+        --pt-feedback-bg: rgba(139,92,246,0.08);
+        --pt-layout: #06b6d4;
+        --pt-layout-bg: rgba(6,182,212,0.08);
+        --pt-overlay: #ec4899;
+        --pt-overlay-bg: rgba(236,72,153,0.08);
+      }
+
+      .pt-overlay-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 9990;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .pt-overlay-bg.pt-active { opacity: 1; pointer-events: auto; }
+
+      .pt-detail-panel {
+        position: fixed;
+        bottom: -400px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        max-width: 90vw;
+        background: var(--pt-surface);
+        border: 1px solid var(--pt-border);
+        border-radius: 16px 16px 0 0;
+        padding: 30px;
+        z-index: 9991;
+        transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 -10px 50px rgba(0,0,0,0.5);
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--pt-text);
+      }
+      .pt-detail-panel.pt-open { bottom: 0; }
+
+      .pt-detail-panel .pt-close-btn {
+        position: absolute;
+        top: 12px; right: 16px;
+        background: none;
+        border: none;
+        color: var(--pt-text-dim);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.15s;
+      }
+      .pt-detail-panel .pt-close-btn:hover { background: rgba(255,255,255,0.05); color: var(--pt-text); }
+
+      .pt-detail-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+
+      .pt-detail-tile-preview {
+        width: 80px; height: 80px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid;
+      }
+      .pt-detail-tile-preview .pt-sym { font-size: 1.8rem; font-weight: 700; }
+      .pt-detail-tile-preview .pt-weight-badge {
+        font-size: 0.6rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        opacity: 0.6;
+        color: var(--pt-text);
+      }
+
+      .pt-detail-info h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; color: var(--pt-text); }
+      .pt-detail-info .pt-detail-category {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 10px;
+      }
+      .pt-detail-info .pt-detail-desc { font-size: 0.85rem; color: var(--pt-text-dim); line-height: 1.5; margin: 0; }
+
+      .pt-detail-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--pt-border);
+      }
+      .pt-meta-item { text-align: center; }
+      .pt-meta-item .pt-meta-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--pt-text-muted);
+        margin-bottom: 4px;
+      }
+      .pt-meta-item .pt-meta-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--pt-text);
+      }
+
+      .pt-detail-composition {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--pt-border);
+      }
+      .pt-detail-composition h4 {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--pt-text-muted);
+        margin-bottom: 10px;
+      }
+      .pt-composition-atoms { display: flex; gap: 8px; flex-wrap: wrap; }
+      .pt-comp-atom {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid var(--pt-border);
+        background: rgba(255,255,255,0.02);
+        color: var(--pt-text);
+      }
+      .pt-comp-atom .pt-comp-symbol {
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Responsive */
+      @media (max-width: 1100px) {
+        .pt-grid { gap: 3px; }
+        .pt-tile .pt-sym { font-size: 0.9rem; }
+        .pt-tile .pt-name { font-size: 0.35rem; }
+        .pt-tile .pt-w { font-size: 0.4rem; }
+      }
+      @media (max-width: 768px) {
+        .pt-hero { padding: 20px 10px; overflow-x: auto; overflow-y: hidden; border-radius: 8px; -webkit-overflow-scrolling: touch; }
+        .pt-header h2 { font-size: 1.4rem; }
+        .pt-header { margin-bottom: 16px; }
+        .pt-weight-scale { display: none; }
+        .pt-legend {
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          justify-content: flex-start;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 8px;
+          margin-bottom: 16px;
+          gap: 6px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .pt-legend::-webkit-scrollbar { display: none; }
+        .pt-legend-item { font-size: 0.6rem; padding: 4px 8px; white-space: nowrap; flex-shrink: 0; }
+        .pt-grid {
+          min-width: 700px;
+          gap: 3px;
+        }
+        .pt-tile .pt-sym { font-size: 0.85rem; }
+        .pt-tile .pt-name { font-size: 0.35rem; }
+        .pt-tile .pt-w { font-size: 0.4rem; top: 2px; left: 3px; }
+      }
+      @media (max-width: 480px) {
+        .pt-hero { padding: 14px 8px; }
+        .pt-header h2 { font-size: 1.1rem; }
+        .pt-header .pt-subtitle { font-size: 0.6rem; }
+        .pt-legend-item { font-size: 0.55rem; padding: 3px 6px; }
+      }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   </head>
 
   <body>
@@ -58,13 +496,6 @@
         <p>Case Study 01</p>
       </header>
 
-      <!-- Governed Hero Media Slot -->
-      <section aria-label="Hero image">
-        <div aria-label="Hero image">
-          <img src="/assets/images/_Hero_Image_8.png" alt="Tokenized Design System hero image" />
-        </div>
-      </section>
-
       <!-- Context -->
       <section aria-labelledby="context">
         <h2 id="context" class="section-hero-title">Overview</h2>
@@ -76,6 +507,7 @@
           organizations.
         </p>
       </section>
+
       <!-- Problem -->
       <section aria-labelledby="problem">
         <h2 id="problem">Role</h2>
@@ -86,6 +518,100 @@
           Mentored designers and guided system adoption and evolution.
         </p>
       </section>
+
+      <!-- Interactive Periodic Table Hero -->
+      <section class="pt-hero" aria-label="Interactive periodic table of UI components">
+        <div class="pt-header">
+          <h2>Periodic Table of UI</h2>
+          <p class="pt-subtitle">An Atomic Design System</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="pt-legend" id="ptLegend">
+          <button class="pt-legend-item active" data-filter="all">
+            <span class="pt-legend-dot" style="background: var(--pt-text-dim)"></span>
+            All
+          </button>
+          <button class="pt-legend-item" data-filter="primitives">
+            <span class="pt-legend-dot" style="background: var(--pt-primitives)"></span>
+            Primitives
+          </button>
+          <button class="pt-legend-item" data-filter="inputs">
+            <span class="pt-legend-dot" style="background: var(--pt-inputs)"></span>
+            Inputs
+          </button>
+          <button class="pt-legend-item" data-filter="display">
+            <span class="pt-legend-dot" style="background: var(--pt-display)"></span>
+            Display
+          </button>
+          <button class="pt-legend-item" data-filter="navigation">
+            <span class="pt-legend-dot" style="background: var(--pt-navigation)"></span>
+            Navigation
+          </button>
+          <button class="pt-legend-item" data-filter="feedback">
+            <span class="pt-legend-dot" style="background: var(--pt-feedback)"></span>
+            Feedback
+          </button>
+          <button class="pt-legend-item" data-filter="layout">
+            <span class="pt-legend-dot" style="background: var(--pt-layout)"></span>
+            Layout
+          </button>
+          <button class="pt-legend-item" data-filter="overlay">
+            <span class="pt-legend-dot" style="background: var(--pt-overlay)"></span>
+            Overlay
+          </button>
+        </div>
+
+        <!-- Weight Scale -->
+        <div class="pt-weight-scale">
+          <div class="pt-weight-block"><span class="pt-wb-num">1</span>Atom</div>
+          <div class="pt-weight-block"><span class="pt-wb-num">2</span>Molecule</div>
+          <div class="pt-weight-block"><span class="pt-wb-num">3</span>Compound</div>
+          <div class="pt-weight-block"><span class="pt-wb-num">4</span>Complex</div>
+          <div class="pt-weight-block"><span class="pt-wb-num">5</span>Organism</div>
+          <div class="pt-weight-block"><span class="pt-wb-num">6</span>System</div>
+        </div>
+
+        <!-- The Table Grid -->
+        <div class="pt-grid" id="ptGrid"></div>
+
+      </section>
+
+      <!-- Periodic Table Overlay + Detail Panel (outside main for fixed positioning) -->
+      <div class="pt-overlay-bg" id="ptOverlayBg"></div>
+      <div class="pt-detail-panel" id="ptDetailPanel">
+        <button class="pt-close-btn" id="ptCloseDetail" aria-label="Close detail panel">&times;</button>
+        <div class="pt-detail-header">
+          <div class="pt-detail-tile-preview" id="ptDetailTile">
+            <span class="pt-weight-badge" id="ptDetailWeight"></span>
+            <span class="pt-sym" id="ptDetailSymbol"></span>
+          </div>
+          <div class="pt-detail-info">
+            <h3 id="ptDetailName"></h3>
+            <div class="pt-detail-category" id="ptDetailCategory"></div>
+            <p class="pt-detail-desc" id="ptDetailDesc"></p>
+          </div>
+        </div>
+        <div class="pt-detail-meta">
+          <div class="pt-meta-item">
+            <div class="pt-meta-label">Weight</div>
+            <div class="pt-meta-value" id="ptMetaWeight"></div>
+          </div>
+          <div class="pt-meta-item">
+            <div class="pt-meta-label">Level</div>
+            <div class="pt-meta-value" id="ptMetaLevel"></div>
+          </div>
+          <div class="pt-meta-item">
+            <div class="pt-meta-label">Children</div>
+            <div class="pt-meta-value" id="ptMetaChildren"></div>
+          </div>
+        </div>
+        <div class="pt-detail-composition" id="ptDetailComposition">
+          <h4>Composition</h4>
+          <div class="pt-composition-atoms" id="ptCompositionAtoms"></div>
+        </div>
+      </div>
+
       <!-- Approach -->
       <section aria-labelledby="approach">
         <h2 id="approach">System / Work</h2>
@@ -169,5 +695,163 @@
 
     <!-- Client-side includes script -->
     <script src="/_includes.js" defer></script>
+
+    <!-- Periodic Table Interactive Script -->
+    <script>
+    (function() {
+      const components = [
+        // Row 1 — Weight 1: Atoms
+        { id:1, symbol:'Ic', name:'Icon', cat:'primitives', weight:1, row:1, col:1, desc:'The smallest visual unit. A single glyph or SVG symbol conveying meaning.', level:'Atom', children:0, composition:[] },
+        { id:2, symbol:'Tx', name:'Text', cat:'primitives', weight:1, row:1, col:2, desc:'Raw typographic element. A span of characters with a given style.', level:'Atom', children:0, composition:[] },
+        { id:3, symbol:'Lb', name:'Label', cat:'primitives', weight:1, row:1, col:3, desc:'A text annotation bound to another element. Describes a sibling input or control.', level:'Atom', children:0, composition:[] },
+        { id:4, symbol:'Dv', name:'Divider', cat:'primitives', weight:1, row:1, col:17, desc:'A single line or rule that separates content regions.', level:'Atom', children:0, composition:[] },
+        { id:5, symbol:'Sp', name:'Spacer', cat:'primitives', weight:1, row:1, col:18, desc:'Invisible layout atom. Controls whitespace between siblings.', level:'Atom', children:0, composition:[] },
+        // Row 2 — Weight 2: Molecules
+        { id:6, symbol:'Bt', name:'Button', cat:'inputs', weight:2, row:2, col:1, desc:'Interactive trigger combining label + optional icon. The primary call-to-action atom.', level:'Molecule', children:2, composition:['Ic','Tx'] },
+        { id:7, symbol:'Lk', name:'Link', cat:'navigation', weight:2, row:2, col:2, desc:'Navigational text anchor. Text that transports the user to another context.', level:'Molecule', children:1, composition:['Tx'] },
+        { id:8, symbol:'Tg', name:'Toggle', cat:'inputs', weight:2, row:2, col:3, desc:'Binary state switch. On/off control with visual feedback.', level:'Molecule', children:1, composition:['Lb'] },
+        { id:9, symbol:'Cb', name:'Checkbox', cat:'inputs', weight:2, row:2, col:4, desc:'Multi-select boolean input with a label.', level:'Molecule', children:2, composition:['Ic','Lb'] },
+        { id:10, symbol:'Rd', name:'Radio', cat:'inputs', weight:2, row:2, col:5, desc:'Single-select option within a group. Mutually exclusive with siblings.', level:'Molecule', children:2, composition:['Ic','Lb'] },
+        { id:11, symbol:'Bg', name:'Badge', cat:'feedback', weight:2, row:2, col:14, desc:'Compact status indicator. Overlays a count or label on its parent.', level:'Molecule', children:2, composition:['Ic','Tx'] },
+        { id:12, symbol:'Tg', name:'Tag', cat:'display', weight:2, row:2, col:15, desc:'Categorization chip. Labels content with a removable keyword.', level:'Molecule', children:2, composition:['Tx','Ic'] },
+        { id:13, symbol:'Sn', name:'Spinner', cat:'feedback', weight:2, row:2, col:16, desc:'Indeterminate loading indicator. Animated icon signaling async work.', level:'Molecule', children:1, composition:['Ic'] },
+        { id:14, symbol:'Im', name:'Image', cat:'display', weight:2, row:2, col:17, desc:'Raster or vector visual. A rendered graphic with alt-text fallback.', level:'Molecule', children:1, composition:['Tx'] },
+        { id:15, symbol:'Av', name:'Avatar', cat:'display', weight:2, row:2, col:18, desc:'Identity thumbnail. Image or initials representing a user entity.', level:'Molecule', children:2, composition:['Im','Tx'] },
+        // Row 3 — Weight 3: Compounds
+        { id:16, symbol:'In', name:'Input', cat:'inputs', weight:3, row:3, col:1, desc:'Text entry field with label, placeholder, and validation. Core data-capture compound.', level:'Compound', children:3, composition:['Lb','Tx','Ic'] },
+        { id:17, symbol:'Sl', name:'Select', cat:'inputs', weight:3, row:3, col:2, desc:'Dropdown selector. Combines an input face with a collapsible option list.', level:'Compound', children:3, composition:['In','Ic','Tx'] },
+        { id:18, symbol:'Ts', name:'Toast', cat:'feedback', weight:3, row:3, col:3, desc:'Ephemeral notification. Auto-dismissing message bar with icon and action.', level:'Compound', children:3, composition:['Ic','Tx','Bt'] },
+        { id:19, symbol:'Al', name:'Alert', cat:'feedback', weight:3, row:3, col:4, desc:'Persistent status message. Prominent banner conveying warning, error, or success.', level:'Compound', children:3, composition:['Ic','Tx','Bt'] },
+        { id:20, symbol:'Pg', name:'Progress', cat:'feedback', weight:3, row:3, col:5, desc:'Determinate loading bar. Visualizes completion percentage with a label.', level:'Compound', children:2, composition:['Tx','Lb'] },
+        { id:21, symbol:'Tp', name:'Tooltip', cat:'overlay', weight:3, row:3, col:14, desc:'Hover-triggered info bubble. Provides context without cluttering the layout.', level:'Compound', children:2, composition:['Tx','Ic'] },
+        { id:22, symbol:'Bc', name:'Breadcrumb', cat:'navigation', weight:3, row:3, col:15, desc:'Path trail. A chain of links showing the user\'s position in a hierarchy.', level:'Compound', children:3, composition:['Lk','Ic','Dv'] },
+        { id:23, symbol:'Tb', name:'Tabs', cat:'navigation', weight:3, row:3, col:16, desc:'Section switcher. Horizontal tab bar controlling visible content panels.', level:'Compound', children:3, composition:['Bt','Ic','Tx'] },
+        { id:24, symbol:'Pp', name:'Popover', cat:'overlay', weight:3, row:3, col:17, desc:'Click-triggered floating panel. Richer than tooltip, anchored to a trigger.', level:'Compound', children:3, composition:['Tx','Bt','Ic'] },
+        { id:25, symbol:'Ac', name:'Accordion', cat:'layout', weight:3, row:3, col:18, desc:'Collapsible section. Expands/contracts to reveal nested content on demand.', level:'Compound', children:3, composition:['Tx','Ic','Dv'] },
+        // Row 4 — Weight 4: Complex
+        { id:26, symbol:'Cd', name:'Card', cat:'layout', weight:4, row:4, col:1, desc:'Content container with image, title, body, and actions. The workhorse layout molecule.', level:'Complex', children:4, composition:['Im','Tx','Bt','Dv'] },
+        { id:27, symbol:'Ls', name:'List Item', cat:'layout', weight:4, row:4, col:2, desc:'Row in a vertical collection. Avatar + text + meta + action in a consistent rhythm.', level:'Complex', children:4, composition:['Av','Tx','Bg','Ic'] },
+        { id:28, symbol:'Sr', name:'Search', cat:'inputs', weight:4, row:4, col:3, desc:'Query interface. Input + icon + clear button + suggestions dropdown.', level:'Complex', children:4, composition:['In','Ic','Bt','Pp'] },
+        { id:29, symbol:'Pg', name:'Pagination', cat:'navigation', weight:4, row:4, col:14, desc:'Page navigator. Prev/next buttons + page numbers for large datasets.', level:'Complex', children:3, composition:['Bt','Tx','Ic'] },
+        { id:30, symbol:'St', name:'Stepper', cat:'navigation', weight:4, row:4, col:15, desc:'Multi-step progress. Numbered stages connected by a progress line.', level:'Complex', children:4, composition:['Ic','Tx','Pg','Dv'] },
+        { id:31, symbol:'Mn', name:'Menu', cat:'overlay', weight:4, row:4, col:16, desc:'Action list overlay. Vertical stack of interactive items triggered by a button.', level:'Complex', children:4, composition:['Bt','Ic','Tx','Dv'] },
+        { id:32, symbol:'Dt', name:'Date Pick', cat:'inputs', weight:4, row:4, col:17, desc:'Calendar input. Combines an input field with a calendar grid overlay.', level:'Complex', children:4, composition:['In','Bt','Ic','Pp'] },
+        { id:33, symbol:'Cm', name:'Comment', cat:'display', weight:4, row:4, col:18, desc:'User-generated content block. Avatar + name + timestamp + text body + actions.', level:'Complex', children:4, composition:['Av','Tx','Bt','Dv'] },
+        // Row 5 — Weight 5: Organisms
+        { id:34, symbol:'Md', name:'Modal', cat:'overlay', weight:5, row:5, col:1, desc:'Focus-stealing dialog. Full overlay with header, body, and action footer.', level:'Organism', children:5, composition:['Tx','Bt','Ic','Dv','In'] },
+        { id:35, symbol:'Dr', name:'Drawer', cat:'overlay', weight:5, row:5, col:2, desc:'Slide-in panel. Side-anchored container for secondary navigation or detail views.', level:'Organism', children:5, composition:['Tx','Bt','Ic','Dv','Lk'] },
+        { id:36, symbol:'Fm', name:'Form', cat:'inputs', weight:5, row:5, col:3, desc:'Data-capture organism. Coordinated set of inputs with validation and submit logic.', level:'Organism', children:5, composition:['In','Sl','Cb','Bt','Al'] },
+        { id:37, symbol:'Tl', name:'Table', cat:'display', weight:5, row:5, col:4, desc:'Tabular data grid. Sortable, filterable rows and columns with pagination.', level:'Organism', children:5, composition:['Tx','Bt','Ic','Bg','Pg'] },
+        { id:38, symbol:'Nb', name:'Navbar', cat:'navigation', weight:5, row:5, col:15, desc:'Top-level navigation bar. Logo + links + search + user avatar across the header.', level:'Organism', children:5, composition:['Im','Lk','Sr','Av','Bt'] },
+        { id:39, symbol:'Sd', name:'Sidebar', cat:'navigation', weight:5, row:5, col:16, desc:'Persistent vertical nav. Collapsible column of grouped navigation links.', level:'Organism', children:5, composition:['Lk','Ic','Tx','Dv','Ac'] },
+        { id:40, symbol:'Hd', name:'Header', cat:'layout', weight:5, row:5, col:17, desc:'Page header organism. Title + breadcrumb + actions + tabs combined.', level:'Organism', children:5, composition:['Tx','Bc','Bt','Tb','Dv'] },
+        { id:41, symbol:'Ft', name:'Footer', cat:'layout', weight:5, row:5, col:18, desc:'Page footer organism. Links + legal text + branding anchored at the bottom.', level:'Organism', children:4, composition:['Lk','Tx','Dv','Im'] },
+        // Row 6 — Weight 6: Systems
+        { id:42, symbol:'Dp', name:'Dashboard', cat:'layout', weight:6, row:6, col:1, desc:'Full page template. Sidebar + header + card grid + charts assembled.', level:'System', children:6, composition:['Sd','Hd','Cd','Tl','Nb','Ft'] },
+        { id:43, symbol:'Ap', name:'Auth Page', cat:'layout', weight:6, row:6, col:2, desc:'Authentication template. Logo + form + social logins + legal links.', level:'System', children:5, composition:['Im','Fm','Bt','Lk','Tx'] },
+        { id:44, symbol:'Sp', name:'Settings', cat:'layout', weight:6, row:6, col:3, desc:'Preferences template. Tabbed sections of forms and toggles.', level:'System', children:6, composition:['Tb','Fm','Tg','Bt','Al','Hd'] },
+        { id:45, symbol:'Lp', name:'List Page', cat:'layout', weight:6, row:6, col:17, desc:'Collection view template. Search + filters + table/list + pagination assembled.', level:'System', children:5, composition:['Sr','Tl','Pg','Hd','Ft'] },
+        { id:46, symbol:'Dt', name:'Detail', cat:'layout', weight:6, row:6, col:18, desc:'Entity detail template. Header + content sections + related items + actions.', level:'System', children:6, composition:['Hd','Cd','Tb','Cm','Bt','Ft'] }
+      ];
+
+      const grid = document.getElementById('ptGrid');
+      const totalRows = 6, totalCols = 18;
+
+      for (let r = 1; r <= totalRows; r++) {
+        for (let c = 1; c <= totalCols; c++) {
+          const comp = components.find(function(x) { return x.row === r && x.col === c; });
+          if (comp) {
+            var tile = document.createElement('button');
+            tile.className = 'pt-tile pt-' + comp.cat;
+            tile.dataset.id = comp.id;
+            tile.dataset.cat = comp.cat;
+            tile.setAttribute('aria-label', comp.name + ' — ' + comp.cat);
+            tile.innerHTML =
+              '<span class="pt-w">' + comp.weight + '</span>' +
+              '<span class="pt-sym">' + comp.symbol + '</span>' +
+              '<span class="pt-name">' + comp.name + '</span>';
+            tile.addEventListener('click', (function(c) { return function() { openPtDetail(c); }; })(comp));
+            grid.appendChild(tile);
+          } else {
+            var empty = document.createElement('div');
+            empty.className = 'pt-empty';
+            grid.appendChild(empty);
+          }
+        }
+      }
+
+      var panel = document.getElementById('ptDetailPanel');
+      var overlayBg = document.getElementById('ptOverlayBg');
+
+      function openPtDetail(comp) {
+        var catVar = '--pt-' + comp.cat;
+        var catBgVar = '--pt-' + comp.cat + '-bg';
+        var tilePreview = document.getElementById('ptDetailTile');
+        var symEl = document.getElementById('ptDetailSymbol');
+        var catEl = document.getElementById('ptDetailCategory');
+
+        tilePreview.style.background = 'var(' + catBgVar + ')';
+        tilePreview.style.borderColor = 'var(' + catVar + ')';
+        symEl.style.color = 'var(' + catVar + ')';
+        symEl.textContent = comp.symbol;
+        document.getElementById('ptDetailWeight').textContent = comp.weight;
+        document.getElementById('ptDetailName').textContent = comp.name;
+        catEl.style.color = 'var(' + catVar + ')';
+        catEl.textContent = comp.cat;
+        document.getElementById('ptDetailDesc').textContent = comp.desc;
+        document.getElementById('ptMetaWeight').textContent = comp.weight;
+        document.getElementById('ptMetaLevel').textContent = comp.level;
+        document.getElementById('ptMetaChildren').textContent = comp.children;
+
+        var atomsDiv = document.getElementById('ptCompositionAtoms');
+        var compSection = document.getElementById('ptDetailComposition');
+        if (comp.composition.length === 0) {
+          compSection.style.display = 'none';
+        } else {
+          compSection.style.display = 'block';
+          atomsDiv.innerHTML = comp.composition.map(function(sym) {
+            var found = components.find(function(c) { return c.symbol === sym; });
+            var color = found ? 'var(--pt-' + found.cat + ')' : 'var(--pt-text-dim)';
+            var cname = found ? found.name : sym;
+            return '<span class="pt-comp-atom"><span class="pt-comp-symbol" style="color:' + color + '">' + sym + '</span>' + cname + '</span>';
+          }).join('');
+        }
+
+        panel.classList.add('pt-open');
+        overlayBg.classList.add('pt-active');
+      }
+
+      function closePtDetail() {
+        panel.classList.remove('pt-open');
+        overlayBg.classList.remove('pt-active');
+      }
+
+      document.getElementById('ptCloseDetail').addEventListener('click', closePtDetail);
+      overlayBg.addEventListener('click', closePtDetail);
+
+      // Legend filtering
+      var legendItems = document.querySelectorAll('.pt-legend-item');
+      legendItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+          var filter = item.dataset.filter;
+          legendItems.forEach(function(li) { li.classList.remove('active'); });
+          item.classList.add('active');
+          document.querySelectorAll('.pt-tile').forEach(function(tile) {
+            if (filter === 'all' || tile.dataset.cat === filter) {
+              tile.classList.remove('pt-dimmed');
+            } else {
+              tile.classList.add('pt-dimmed');
+            }
+          });
+        });
+      });
+
+      // Keyboard close
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePtDetail();
+      });
+    })();
+    </script>
+
   </body>
 </html>

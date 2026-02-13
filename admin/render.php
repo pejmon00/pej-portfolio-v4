@@ -279,12 +279,17 @@ class Renderer {
         // Each field needs its proper HTML wrapper so we don't strip tags
         $wrappers = [
             'home' => [
-                'heroTitle'      => '<h1 id="hero-title">%s</h1>',
-                'heroText'       => '<p>%s</p>',
-                'heroImage'      => '<img src="%s" alt="Portrait of Pej Vosooghi" />',
-                'servicesImage'  => '%s', // handled specially below
-                'aboutTitle'     => '<h2 id="about-title" class="section-hero-title">%s</h2>',
-                'aboutBody'      => '%s', // already HTML
+                'heroTitle'         => '<h1 id="hero-title">%s</h1>',
+                'heroSubtitle'      => '<h4>%s</h4>',
+                'heroText'          => '<p>%s</p>',
+                'heroImage'         => '<img src="%s" alt="Portrait of Pej Vosooghi" />',
+                'servicesImage'     => '%s', // handled specially below
+                'logo1'             => '%s', // handled specially below
+                'logo2'             => '%s',
+                'logo3'             => '%s',
+                'heroCards'         => '%s', // handled specially below
+                'aboutTitle'        => '<h2 id="about-title" class="section-hero-title">%s</h2>',
+                'aboutBody'         => '%s', // already HTML
             ],
             'gallery' => [
                 'heroTitle'    => '<h1 id="hero-title">%s</h1>',
@@ -298,8 +303,43 @@ class Renderer {
 
         foreach ($pageData as $key => $value) {
             $pattern = '/<!-- editable:' . preg_quote($key, '/') . ' -->.*?<!-- \/editable:' . preg_quote($key, '/') . ' -->/s';
+            // Skip individual CTA fields — they're composed into heroCards
+            if (in_array($key, ['cta1Title', 'cta1Desc', 'cta1Link', 'cta2Title', 'cta2Desc', 'cta2Link'])) {
+                continue;
+            }
+
+            // Special handling for CTA cards
+            if ($key === 'heroCards') {
+                $chevron = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                $cards = '';
+                $c1t = self::esc($pageData['cta1Title'] ?? '');
+                $c1d = self::esc($pageData['cta1Desc'] ?? '');
+                $c1l = self::esc($pageData['cta1Link'] ?? '');
+                $c2t = self::esc($pageData['cta2Title'] ?? '');
+                $c2d = self::esc($pageData['cta2Desc'] ?? '');
+                $c2l = self::esc($pageData['cta2Link'] ?? '');
+                if ($c1t || $c2t) {
+                    $cards = '<div class="hero-cards">';
+                    if ($c1t) {
+                        $cards .= '<a href="' . $c1l . '" class="hero-card"><span class="hero-card__title">' . $c1t . '</span><span class="hero-card__desc">' . $c1d . '</span>' . $chevron . '</a>';
+                    }
+                    if ($c2t) {
+                        $cards .= '<a href="' . $c2l . '" class="hero-card"><span class="hero-card__title">' . $c2t . '</span><span class="hero-card__desc">' . $c2d . '</span>' . $chevron . '</a>';
+                    }
+                    $cards .= '</div>';
+                }
+                $wrapped = $cards;
+                $replacement = '<!-- editable:heroCards -->' . $wrapped . '<!-- /editable:heroCards -->';
+                $html = preg_replace($pattern, $replacement, $html);
+                continue;
+            }
+
             // Special handling for image-only fields
-            if ($key === 'servicesImage') {
+            if (in_array($key, ['logo1', 'logo2', 'logo3'])) {
+                $wrapped = !empty($value)
+                    ? '<img src="' . self::esc($value) . '" alt="Company logo" />'
+                    : '';
+            } elseif ($key === 'servicesImage') {
                 $wrapped = !empty($value)
                     ? '<div aria-label="Services image"><img src="' . self::esc($value) . '" alt="Services" /></div>'
                     : '';
@@ -325,43 +365,96 @@ class Renderer {
 
         $tpl = file_get_contents(TEMPLATES_PATH . '/gallery.html');
 
-        // Gallery project cards
-        $projectsHtml = '';
+        // Load sections (default to product + information if none defined)
+        $sections = $pageData['sections'] ?? [
+            ['id' => 'product', 'label' => 'Product Design', 'order' => 1],
+            ['id' => 'information', 'label' => 'Information Design', 'order' => 2],
+        ];
+        usort($sections, function ($a, $b) { return ($a['order'] ?? 0) - ($b['order'] ?? 0); });
+
+        // Group projects by category
+        $projectsByCategory = [];
         foreach ($gallery as $project) {
-            $images = $project['images'] ?? [];
-            if (empty($images)) continue;
+            $cat = $project['category'] ?? 'product';
+            $projectsByCategory[$cat][] = $project;
+        }
 
-            $coverImg = $images[0];
-            $projectsHtml .= '          <div class="gallery-project" data-project-id="' . intval($project['id']) . '">' . "\n";
-            $projectsHtml .= '            <h3 class="gallery-project__title">' . self::esc($project['title']) . '</h3>' . "\n";
-            $projectsHtml .= '            <div class="gallery-project__cover" data-description="' . self::esc($coverImg['description'] ?? '') . '">' . "\n";
-            $projectsHtml .= '              <img src="' . self::esc($coverImg['src']) . '" alt="' . self::esc($coverImg['alt']) . '" loading="lazy" />' . "\n";
-            $projectsHtml .= '            </div>' . "\n";
+        // Build secondary nav
+        $navHtml = '';
+        foreach ($sections as $i => $sec) {
+            $slug = self::slugify($sec['id']);
+            $navHtml .= '        <li><a href="#' . $slug . '-top">' . self::esc($sec['label']) . '</a></li>' . "\n";
+        }
 
-            if (count($images) > 1) {
-                $projectsHtml .= '            <div class="gallery-project__thumbs">' . "\n";
-                foreach ($images as $i => $img) {
-                    $active = ($i === 0) ? ' active' : '';
-                    $projectsHtml .= '              <button class="gallery-project__thumb' . $active . '" data-index="' . $i . '" data-description="' . self::esc($img['description'] ?? '') . '" aria-label="View image ' . ($i + 1) . '">' . "\n";
-                    $projectsHtml .= '                <img src="' . self::esc($img['src']) . '" alt="" loading="lazy" />' . "\n";
-                    $projectsHtml .= '              </button>' . "\n";
-                }
-                $projectsHtml .= '            </div>' . "\n";
+        // Build gallery sections
+        $sectionsHtml = '';
+        foreach ($sections as $i => $sec) {
+            $slug = self::slugify($sec['id']);
+            $projects = $projectsByCategory[$sec['id']] ?? [];
+
+            // First section anchor goes inside header (for tight divider spacing)
+            if ($i === 0) {
+                // Handled via heroImageSlot replacement — add anchor after header
             }
 
-            $projectsHtml .= '          </div>' . "\n";
+            // Anchor div (first section uses different placement)
+            if ($i > 0) {
+                $sectionsHtml .= '      <div id="' . $slug . '-top" aria-hidden="true"></div>' . "\n";
+            }
+            $sectionsHtml .= '      <hr class="section-divider" aria-hidden="true" />' . "\n";
+            $sectionsHtml .= '      <section class="gallery-section" aria-labelledby="' . $slug . '">' . "\n";
+            $sectionsHtml .= '        <h2 id="' . $slug . '" class="section-hero-title">' . self::esc($sec['label']) . '</h2>' . "\n";
+            $sectionsHtml .= '        <div class="gallery-grid">' . "\n";
+            $sectionsHtml .= self::buildGalleryProjectsHtml($projects);
+            $sectionsHtml .= '        </div>' . "\n";
+            $sectionsHtml .= '      </section>' . "\n\n";
         }
+
+        // First section anchor — append inside heroImageSlot area
+        $firstSlug = !empty($sections) ? self::slugify($sections[0]['id']) : 'gallery';
+        $heroSlot = self::heroImageSlot($pageData);
+        $heroSlot .= "\n" . '        <div id="' . $firstSlug . '-top" aria-hidden="true"></div>';
 
         $replacements = [
             '{{heroTitle}}'        => self::esc($pageData['heroTitle'] ?? 'Gallery'),
             '{{heroSubtitle}}'     => self::esc($pageData['heroSubtitle'] ?? ''),
             '{{heroText}}'         => self::esc($pageData['heroText'] ?? ''),
-            '{{heroImageSlot}}'    => self::heroImageSlot($pageData),
-            '{{galleryProjects}}'  => $projectsHtml,
+            '{{heroImageSlot}}'    => $heroSlot,
+            '{{secondaryNav}}'     => $navHtml,
+            '{{gallerySections}}'  => $sectionsHtml,
         ];
 
         $html = str_replace(array_keys($replacements), array_values($replacements), $tpl);
         file_put_contents(BASE_PATH . '/gallery/index.html', $html);
+    }
+
+    private static function buildGalleryProjectsHtml($projects) {
+        $html = '';
+        foreach ($projects as $project) {
+            $images = $project['images'] ?? [];
+            if (empty($images)) continue;
+
+            $coverImg = $images[0];
+            $html .= '          <div class="gallery-project" data-project-id="' . intval($project['id']) . '">' . "\n";
+            $html .= '            <h3 class="gallery-project__title">' . self::esc($project['title']) . '</h3>' . "\n";
+            $html .= '            <div class="gallery-project__cover" data-description="' . self::esc($coverImg['description'] ?? '') . '">' . "\n";
+            $html .= '              <img src="' . self::esc($coverImg['src']) . '" alt="' . self::esc($coverImg['alt']) . '" loading="lazy" />' . "\n";
+            $html .= '            </div>' . "\n";
+
+            if (count($images) > 1) {
+                $html .= '            <div class="gallery-project__thumbs">' . "\n";
+                foreach ($images as $i => $img) {
+                    $active = ($i === 0) ? ' active' : '';
+                    $html .= '              <button class="gallery-project__thumb' . $active . '" data-index="' . $i . '" data-description="' . self::esc($img['description'] ?? '') . '" aria-label="View image ' . ($i + 1) . '">' . "\n";
+                    $html .= '                <img src="' . self::esc($img['src']) . '" alt="" loading="lazy" />' . "\n";
+                    $html .= '              </button>' . "\n";
+                }
+                $html .= '            </div>' . "\n";
+            }
+
+            $html .= '          </div>' . "\n";
+        }
+        return $html;
     }
 
     // ---- Delete article directory ----
@@ -413,6 +506,14 @@ class Renderer {
         return '        <div aria-label="Hero image">' . "\n" .
                '          <img src="' . self::esc($src) . '" alt="Hero image" />' . "\n" .
                '        </div>';
+    }
+
+    // ---- Slug helper ----
+
+    private static function slugify($str) {
+        $str = strtolower(trim($str ?? ''));
+        $str = preg_replace('/[^a-z0-9]+/', '-', $str);
+        return trim($str, '-');
     }
 
     // ---- HTML-escape helper ----
