@@ -19,8 +19,7 @@
   }
 
   function setActiveLink(hash, nav) {
-    var links = qsAll("a", nav);
-    links = nav ? Array.prototype.slice.call(nav.querySelectorAll("a")) : [];
+    var links = nav ? Array.prototype.slice.call(nav.querySelectorAll("a")) : [];
     links.forEach(function (a) {
       if (normalizeHash(a.getAttribute("href")) === hash) {
         a.setAttribute("aria-current", "page");
@@ -51,26 +50,47 @@
 
       if (!targets.length) return;
 
-      // For each anchor target, find the next sibling section to observe
-      // (anchor divs are zero-height, so observe the real section instead)
+      // For each anchor target, find the section to observe.
+      // Two cases: (1) standalone anchor div — walk siblings to find next section,
+      // (2) element inside a section (e.g. an h2 id) — use the parent section.
       var sectionTargets = targets.map(function (t) {
-        // Walk forward from the anchor to find the nearest section with content
         var el = t.el;
         var section = null;
-        while (el && !section) {
-          el = el.nextElementSibling;
-          if (el && (el.tagName === "SECTION" || el.tagName === "HR")) {
-            // Skip dividers, find the section
-            if (el.tagName === "SECTION") section = el;
+
+        // If the element is already inside a section, use that section
+        var parentSection = el.closest ? el.closest("section") : null;
+        if (parentSection) {
+          section = parentSection;
+        } else {
+          // Walk forward from the anchor to find the nearest sibling section
+          while (el && !section) {
+            el = el.nextElementSibling;
+            if (el && (el.tagName === "SECTION" || el.tagName === "HR")) {
+              if (el.tagName === "SECTION") section = el;
+            }
           }
         }
         return { hash: t.hash, el: t.el, section: section, link: t.link };
       });
 
+      // Suppress observer updates during smooth-scroll navigation
+      var scrollLocked = false;
+      var scrollTimer = null;
+
+      function lockScroll(hash) {
+        scrollLocked = true;
+        setActiveLink(hash, nav);
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function () {
+          scrollLocked = false;
+        }, 1000);
+      }
+
       // Create an observer on the actual sections
       var activeHash = null;
       var observer = new IntersectionObserver(
         function (entries) {
+          if (scrollLocked) return;
           entries.forEach(function (entry) {
             var target = sectionTargets.find(function (t) {
               return t.section === entry.target;
@@ -94,11 +114,18 @@
         if (t.section) observer.observe(t.section);
       });
 
+      // Listen for clicks on nav links to lock during scroll
+      links.forEach(function (a) {
+        a.addEventListener("click", function () {
+          var hash = normalizeHash(a.getAttribute("href"));
+          if (hash) lockScroll(hash);
+        });
+      });
+
       // Default: set first link active on load if no hash
       function checkHash() {
         var h = location.hash || "";
         if (!h) {
-          // No hash — activate first link
           setActiveLink(targets[0].hash, nav);
           return;
         }
@@ -107,13 +134,12 @@
             return "#" + t.el.id === h;
           })
         ) {
-          setActiveLink(h, nav);
+          lockScroll(h);
         }
       }
 
       window.addEventListener("hashchange", checkHash);
       window.addEventListener("load", checkHash);
-      // Also set default immediately
       if (!location.hash) {
         setActiveLink(targets[0].hash, nav);
       }
