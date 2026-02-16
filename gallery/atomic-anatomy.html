@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anatomy of an Atomic Design System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{
+  font-family:'Inter',sans-serif;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+  height:100%;
+  cursor:default;
+}
+
+/* === PANORAMIC CANVAS === */
+.panorama{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:#000;
+  overflow:hidden;
+}
+
+/* Star field */
+.stars{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+}
+
+/* Horizontal guide lines */
+.guide-line{
+  position:absolute;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.02) 20%,rgba(255,255,255,0.02) 80%,transparent);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Vertical labels — space poster style */
+.v-label{
+  position:absolute;
+  writing-mode:vertical-lr;
+  text-orientation:mixed;
+  font-weight:300;
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.02);
+  z-index:2;
+  pointer-events:none;
+  user-select:none;
+}
+
+.v-label-right{
+  writing-mode:vertical-rl;
+}
+
+/* Section number */
+.section-number{
+  position:absolute;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:300;
+  font-size:9px;
+  color:rgba(255,255,255,0.05);
+  letter-spacing:0.1em;
+  z-index:2;
+  pointer-events:none;
+}
+
+/* === ORBITAL SYSTEM === */
+.orbit{
+  position:absolute;
+  border:1px solid rgba(255,255,255,0.035);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:5;
+}
+
+.orbit.dashed{
+  border-style:dashed;
+  border-color:rgba(255,255,255,0.025);
+}
+
+/* Central body */
+.central-body{
+  position:absolute;
+  border-radius:50%;
+  z-index:15;
+  pointer-events:none;
+}
+
+.central-body-inner{
+  width:100%;height:100%;border-radius:50%;
+  position:relative;overflow:hidden;
+}
+
+.planet-gradient{
+  position:absolute;inset:0;border-radius:50%;
+}
+
+.planet-shadow{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,transparent 40%,rgba(0,0,0,0.7));
+}
+
+/* Concentric rings on central body */
+.body-rings{
+  position:absolute;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+/* === NODE (clickable component) === */
+.node{
+  position:absolute;
+  z-index:20;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+
+.node-dot{
+  width:100%;height:100%;
+  border-radius:50%;
+  position:relative;
+  transition:all 0.3s ease;
+}
+
+.node-core{
+  position:absolute;inset:0;
+  border-radius:50%;
+  transition:all 0.3s ease;
+}
+
+.node-glow{
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:1px solid transparent;
+  transition:all 0.3s ease;
+}
+
+.node:hover .node-glow{
+  border-color:rgba(255,255,255,0.15);
+}
+
+.node:hover{
+  transform:scale(1.3);
+}
+
+.node.active{
+  transform:scale(1.5);
+}
+
+.node.active .node-glow{
+  border-color:rgba(255,255,255,0.3);
+  inset:-10px;
+}
+
+/* Node label */
+.node-label{
+  position:absolute;
+  white-space:nowrap;
+  font-size:8px;
+  font-weight:500;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.2);
+  pointer-events:none;
+  transition:all 0.3s ease;
+}
+
+.node:hover .node-label{
+  color:rgba(255,255,255,0.5);
+}
+
+.node.active .node-label{
+  color:rgba(255,255,255,0.7);
+}
+
+/* Symbol floating near node */
+.node-symbol{
+  position:absolute;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700;
+  color:rgba(255,255,255,0.06);
+  pointer-events:none;
+  transition:all 0.3s ease;
+}
+
+.node:hover .node-symbol{
+  color:rgba(255,255,255,0.15);
+}
+
+/* === ANNOTATION POPUP === */
+.annotation{
+  position:absolute;
+  z-index:100;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(8px);
+  transition:all 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+
+.annotation.visible{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0);
+}
+
+.annotation-card{
+  width:200px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(8,8,14,0.85);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  overflow:hidden;
+  box-shadow:0 16px 50px rgba(0,0,0,0.6),0 0 1px rgba(255,255,255,0.08);
+}
+
+.annotation-head{
+  padding:12px 14px 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+
+.ann-element{
+  width:36px;height:40px;
+  border-radius:7px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,0.05);
+  flex-shrink:0;
+  position:relative;
+}
+
+.ann-element .ann-w{
+  position:absolute;top:3px;left:4px;
+  font-size:6px;font-family:'JetBrains Mono',monospace;
+  font-weight:700;opacity:0.4;
+}
+
+.ann-element .ann-sym{
+  font-size:13px;font-weight:800;line-height:1;
+}
+
+.ann-element .ann-nm{
+  font-size:5.5px;text-transform:uppercase;letter-spacing:0.06em;opacity:0.5;margin-top:1px;
+}
+
+.ann-info h4{
+  font-size:12px;font-weight:700;margin-bottom:2px;
+}
+
+.ann-cat{
+  font-size:8px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.4;
+}
+
+.ann-body{
+  padding:10px 14px 12px;
+}
+
+.ann-desc{
+  font-size:10px;color:rgba(255,255,255,0.45);line-height:1.5;margin-bottom:8px;
+}
+
+.ann-meta{
+  display:flex;gap:8px;
+}
+
+.ann-meta-item{
+  text-align:center;
+}
+
+.ann-meta-label{
+  font-size:6px;text-transform:uppercase;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.2);margin-bottom:2px;
+}
+
+.ann-meta-value{
+  font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;
+}
+
+.ann-composition{
+  display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;padding-top:6px;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+
+.ann-comp-pill{
+  font-size:8px;font-family:'JetBrains Mono',monospace;
+  font-weight:600;padding:2px 5px;border-radius:4px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);
+}
+
+/* === TITLE BLOCK === */
+.title-block{
+  position:absolute;
+  z-index:30;
+}
+
+.title-main{
+  font-size:clamp(16px, 2.5vw, 32px);
+  font-weight:200;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.06);
+  line-height:1;
+}
+
+.title-accent{
+  font-weight:400;
+  color:rgba(255,255,255,0.12);
+}
+
+.title-sub{
+  font-size:clamp(8px, 1vw, 11px);
+  font-weight:400;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.1);
+  margin-top:6px;
+}
+
+/* Thin connecting lines between orbital systems */
+.connect-line{
+  position:absolute;
+  height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,0.015),rgba(255,255,255,0.04),rgba(255,255,255,0.015));
+  z-index:3;
+  pointer-events:none;
+}
+
+/* === BOTTOM NAV === */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:8px 12px;
+  background:linear-gradient(to top,rgba(0,0,0,0.9) 40%,transparent);
+  pointer-events:none;
+}
+
+.nav-card{
+  pointer-events:auto;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 10px;
+  border-radius:7px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:rgba(255,255,255,0.45);
+  font-family:'Inter',sans-serif;
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:0.03em;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all 0.2s;
+  white-space:nowrap;
+}
+
+.nav-card:hover{
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.9);
+  border-color:rgba(255,255,255,0.15);
+}
+
+.nav-card-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:7px;
+  font-weight:700;
+  color:rgba(255,255,255,0.18);
+  letter-spacing:0.05em;
+}
+
+.nav-card--fullscreen{
+  background:rgba(255,255,255,0.05);
+  border-color:rgba(255,255,255,0.1);
+}
+
+.nav-card--fullscreen svg{
+  width:12px;height:12px;
+  opacity:0.5;
+  transition:opacity 0.2s;
+}
+
+.nav-card--fullscreen:hover svg{
+  opacity:1;
+}
+
+@media(max-width:600px){
+  .nav-card{ padding:4px 7px; font-size:8px; }
+  .nav-card-num{ font-size:6px; }
+  .bottom-nav{ gap:3px; padding:6px 6px; }
+}
+
+/* Fullscreen enhancements */
+:fullscreen .annotation-card,
+:-webkit-full-screen .annotation-card{
+  width:220px; border-radius:14px;
+}
+:fullscreen .annotation-head,
+:-webkit-full-screen .annotation-head{
+  padding:14px 16px 10px; gap:10px;
+}
+:fullscreen .ann-element,
+:-webkit-full-screen .ann-element{
+  width:40px; height:44px;
+}
+:fullscreen .ann-info h4,
+:-webkit-full-screen .ann-info h4{
+  font-size:13px;
+}
+:fullscreen .ann-desc,
+:-webkit-full-screen .ann-desc{
+  font-size:11px;
+}
+:fullscreen .node-label,
+:-webkit-full-screen .node-label{
+  font-size:9px;
+}
+:fullscreen .section-number,
+:-webkit-full-screen .section-number{
+  font-size:11px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="panorama" id="panorama">
+  <canvas class="stars" id="starsCanvas"></canvas>
+  <div class="guide-line" style="top:50%;left:0;width:100%"></div>
+  <div class="guide-line" style="top:30%;left:5%;width:90%"></div>
+  <div class="guide-line" style="top:70%;left:5%;width:90%"></div>
+  <div class="title-block" style="left:4%;top:20px">
+    <div class="title-main">A<span class="title-accent">NATOMY</span></div>
+    <div class="title-sub">of an atomic design system</div>
+  </div>
+  <div id="staticElements"></div>
+  <div id="annotationContainer"></div>
+  <div id="orbitalSystems"></div>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+  <a class="nav-card" href="periodic-table-design-system.html">
+    <span class="nav-card-num">01</span> Periodic Table
+  </a>
+  <a class="nav-card" href="glass-window-manager.html">
+    <span class="nav-card-num">02</span> Glass Window
+  </a>
+  <a class="nav-card" href="widget-drawer.html">
+    <span class="nav-card-num">03</span> Widget Drawer
+  </a>
+  <a class="nav-card" href="ai-surface-engine.html">
+    <span class="nav-card-num">04</span> AI Surface
+  </a>
+  <button class="nav-card nav-card--fullscreen" id="fullscreenBtn" aria-label="Full screen">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h4M3 3v4M17 3h-4M17 3v4M3 17h4M3 17v-4M17 17h-4M17 17v-4"/></svg>
+    Full Screen
+  </button>
+</nav>
+
+<script>
+// ===== COMPONENT DATA =====
+const components = {
+  atoms: [
+    { sym:'Ic', w:1, name:'Icon', cat:'primitives', color:'#6366f1', desc:'The smallest visual unit. A single glyph or SVG symbol conveying meaning without text.', level:'Atom', children:0, comp:[] },
+    { sym:'Tx', w:1, name:'Text', cat:'primitives', color:'#6366f1', desc:'Raw typographic element. A span of characters rendered in a given style hierarchy.', level:'Atom', children:0, comp:[] },
+    { sym:'Lb', w:1, name:'Label', cat:'primitives', color:'#6366f1', desc:'Annotation bound to a sibling. Describes the purpose of an adjacent input or control.', level:'Atom', children:0, comp:[] },
+    { sym:'Dv', w:1, name:'Divider', cat:'primitives', color:'#6366f1', desc:'A single horizontal or vertical rule separating content regions.', level:'Atom', children:0, comp:[] },
+    { sym:'Sp', w:1, name:'Spacer', cat:'primitives', color:'#6366f1', desc:'Invisible layout atom. Controls whitespace rhythm between sibling elements.', level:'Atom', children:0, comp:[] },
+  ],
+  molecules: [
+    { sym:'Bt', w:2, name:'Button', cat:'inputs', color:'#f43f5e', desc:'Interactive trigger combining label and optional icon. The primary call-to-action element.', level:'Molecule', children:2, comp:['Ic','Tx'] },
+    { sym:'Tg', w:2, name:'Toggle', cat:'inputs', color:'#f43f5e', desc:'Binary state switch with visual on/off feedback. Immediate-apply boolean control.', level:'Molecule', children:1, comp:['Lb'] },
+    { sym:'Bg', w:2, name:'Badge', cat:'feedback', color:'#8b5cf6', desc:'Compact status indicator. Overlays a count or keyword on its parent element.', level:'Molecule', children:2, comp:['Ic','Tx'] },
+    { sym:'Im', w:2, name:'Image', cat:'display', color:'#f59e0b', desc:'Raster or vector visual with alt-text fallback. A rendered graphic container.', level:'Molecule', children:1, comp:['Tx'] },
+    { sym:'Av', w:2, name:'Avatar', cat:'display', color:'#f59e0b', desc:'Identity thumbnail. Circular image or initials representing a user entity.', level:'Molecule', children:2, comp:['Im','Tx'] },
+    { sym:'Lk', w:2, name:'Link', cat:'navigation', color:'#10b981', desc:'Text-based navigation anchor. Transports the user to a different context on click.', level:'Molecule', children:1, comp:['Tx'] },
+  ],
+  compounds: [
+    { sym:'In', w:3, name:'Input', cat:'inputs', color:'#f43f5e', desc:'Text entry field with label, placeholder, and validation state. Core data-capture compound.', level:'Compound', children:3, comp:['Lb','Tx','Ic'] },
+    { sym:'Ts', w:3, name:'Toast', cat:'feedback', color:'#8b5cf6', desc:'Ephemeral notification bar. Auto-dismissing message with icon and optional action.', level:'Compound', children:3, comp:['Ic','Tx','Bt'] },
+    { sym:'Al', w:3, name:'Alert', cat:'feedback', color:'#8b5cf6', desc:'Persistent status message. Prominent banner conveying warning, error, or success states.', level:'Compound', children:3, comp:['Ic','Tx','Bt'] },
+    { sym:'Tb', w:3, name:'Tabs', cat:'navigation', color:'#10b981', desc:'Horizontal section switcher. Controls which content panel is visible in a shared space.', level:'Compound', children:3, comp:['Bt','Ic','Tx'] },
+    { sym:'Tp', w:3, name:'Tooltip', cat:'overlay', color:'#ec4899', desc:'Hover-triggered info bubble. Provides context about an element without cluttering layout.', level:'Compound', children:2, comp:['Tx','Ic'] },
+    { sym:'Sl', w:3, name:'Select', cat:'inputs', color:'#f43f5e', desc:'Dropdown selector combining an input face with a collapsible options list.', level:'Compound', children:3, comp:['In','Ic','Tx'] },
+  ],
+  organisms: [
+    { sym:'Md', w:5, name:'Modal', cat:'overlay', color:'#ec4899', desc:'Focus-stealing dialog overlay. Header, body, and action footer demanding user decision.', level:'Organism', children:5, comp:['Tx','Bt','Ic','Dv','In'] },
+    { sym:'Fm', w:5, name:'Form', cat:'inputs', color:'#f43f5e', desc:'Coordinated set of inputs with validation logic and submit action. Data capture organism.', level:'Organism', children:5, comp:['In','Sl','Cb','Bt','Al'] },
+    { sym:'Tl', w:5, name:'Table', cat:'display', color:'#f59e0b', desc:'Sortable, filterable tabular grid with pagination. Structured data display organism.', level:'Organism', children:5, comp:['Tx','Bt','Ic','Bg','Pg'] },
+    { sym:'Nb', w:5, name:'Navbar', cat:'navigation', color:'#10b981', desc:'Top-level navigation bar. Logo, links, search, and user avatar across the header.', level:'Organism', children:5, comp:['Im','Lk','Sr','Av','Bt'] },
+    { sym:'Sd', w:5, name:'Sidebar', cat:'navigation', color:'#10b981', desc:'Persistent vertical nav column. Collapsible grouped links for app-level navigation.', level:'Organism', children:5, comp:['Lk','Ic','Tx','Dv','Ac'] },
+  ],
+  systems: [
+    { sym:'Dp', w:6, name:'Dashboard', cat:'layout', color:'#06b6d4', desc:'Full page template assembling sidebar, header, card grids, charts, and data tables.', level:'System', children:6, comp:['Sd','Hd','Cd','Tl','Nb','Ft'] },
+    { sym:'Ap', w:6, name:'Auth Page', cat:'layout', color:'#06b6d4', desc:'Authentication template. Logo, login form, social buttons, and legal footer combined.', level:'System', children:5, comp:['Im','Fm','Bt','Lk','Tx'] },
+    { sym:'Lp', w:6, name:'List Page', cat:'layout', color:'#06b6d4', desc:'Collection view template. Search, filters, table, and pagination assembled into a view.', level:'System', children:5, comp:['Sr','Tl','Pg','Hd','Ft'] },
+    { sym:'Dt', w:6, name:'Detail', cat:'layout', color:'#06b6d4', desc:'Entity detail template. Header, content sections, related items, and action footer.', level:'System', children:6, comp:['Hd','Cd','Tb','Cm','Bt','Ft'] },
+  ]
+};
+
+// ===== ORBITAL SYSTEM DEFINITIONS =====
+const systemDefs = [
+  {
+    key:'atoms', bodyR:40,
+    bodyColor:'radial-gradient(circle at 40% 35%,#1a1a3a,#08080f)',
+    orbits:[100,155],
+    nodes: components.atoms,
+    nodePositions:[
+      {orbit:0,angle:30},{orbit:0,angle:150},{orbit:0,angle:270},
+      {orbit:1,angle:90},{orbit:1,angle:210}
+    ]
+  },
+  {
+    key:'molecules', bodyR:55,
+    bodyColor:'radial-gradient(circle at 40% 35%,#1a1025,#08080f)',
+    orbits:[110,170,220],
+    nodes: components.molecules,
+    nodePositions:[
+      {orbit:0,angle:0},{orbit:0,angle:120},{orbit:0,angle:240},
+      {orbit:1,angle:60},{orbit:1,angle:180},
+      {orbit:2,angle:300}
+    ]
+  },
+  {
+    key:'compounds', bodyR:65,
+    bodyColor:'radial-gradient(circle at 40% 35%,#1a1520,#08080f)',
+    orbits:[120,185,240],
+    nodes: components.compounds,
+    nodePositions:[
+      {orbit:0,angle:20},{orbit:0,angle:140},{orbit:0,angle:260},
+      {orbit:1,angle:70},{orbit:1,angle:190},
+      {orbit:2,angle:320}
+    ]
+  },
+  {
+    key:'organisms', bodyR:80,
+    bodyColor:'radial-gradient(circle at 40% 35%,#0f1a1a,#08080f)',
+    orbits:[130,200,260],
+    nodes: components.organisms,
+    nodePositions:[
+      {orbit:0,angle:45},{orbit:0,angle:165},{orbit:0,angle:285},
+      {orbit:1,angle:110},{orbit:2,angle:230}
+    ]
+  },
+  {
+    key:'systems', bodyR:100,
+    bodyColor:'radial-gradient(circle at 40% 35%,#0a1520,#08080f)',
+    orbits:[160,240,300],
+    nodes: components.systems,
+    nodePositions:[
+      {orbit:0,angle:30},{orbit:0,angle:210},
+      {orbit:1,angle:120},{orbit:2,angle:300}
+    ]
+  }
+];
+
+// ===== DYNAMIC BUILD =====
+const panorama = document.getElementById('panorama');
+const orbContainer = document.getElementById('orbitalSystems');
+const annotationContainer = document.getElementById('annotationContainer');
+const staticEls = document.getElementById('staticElements');
+const canvas = document.getElementById('starsCanvas');
+const ctx = canvas.getContext('2d');
+let activeNode = null;
+let activeAnnotation = null;
+let allNodeEls = [];
+
+// System center positions (% of width) — weighted so larger systems get more room
+const PCTS = [0.08, 0.24, 0.42, 0.63, 0.85];
+
+function buildViz() {
+  orbContainer.innerHTML = '';
+  annotationContainer.innerHTML = '';
+  staticEls.innerHTML = '';
+  activeNode = null;
+  activeAnnotation = null;
+  allNodeEls = [];
+
+  const pw = panorama.offsetWidth;
+  const ph = panorama.offsetHeight;
+  const navH = 44;
+  const usableH = ph - navH;
+  const cy = usableH / 2;
+
+  // Compute max scale that prevents orbital overlap between neighbors
+  const maxOrbits = systemDefs.map(s => s.orbits[s.orbits.length - 1]);
+  let S = 1;
+  for (let i = 0; i < PCTS.length - 1; i++) {
+    const gap = (PCTS[i + 1] - PCTS[i]) * pw;
+    S = Math.min(S, gap / (maxOrbits[i] + maxOrbits[i + 1]));
+  }
+  // Edge constraints — keep orbits on-screen
+  S = Math.min(S, (PCTS[0] * pw - 6) / maxOrbits[0]);
+  S = Math.min(S, ((1 - PCTS[4]) * pw - 6) / maxOrbits[4]);
+  // Height constraint — fit within vertical space
+  S = Math.min(S, (usableH * 0.45) / Math.max(...maxOrbits));
+  S *= 0.88; // breathing room
+
+  // --- Static decorative elements ---
+  const labels = ['ATOMS','MOLECULES','COMPOUNDS','ORGANISMS','SYSTEMS'];
+  const numbers = ['01 — PRIMITIVES','02 — MOLECULES','03 — COMPOUNDS','04 — ORGANISMS','05 — SYSTEMS'];
+  const vLabelSize = Math.max(18, Math.min(38, pw * 0.032));
+
+  labels.forEach((label, i) => {
+    const div = document.createElement('div');
+    div.className = 'v-label' + (i >= 3 ? ' v-label-right' : '');
+    div.textContent = label;
+    const scx = pw * PCTS[i];
+    if (i < 3) {
+      div.style.cssText = `left:${Math.max(2, scx - maxOrbits[i] * S - 18)}px;top:${cy - usableH * 0.28}px;font-size:${vLabelSize}px;font-weight:100`;
+    } else {
+      div.style.cssText = `left:${Math.min(pw - 20, scx + maxOrbits[i] * S + 6)}px;top:${cy - usableH * 0.25}px;font-size:${vLabelSize}px;font-weight:100`;
+    }
+    staticEls.appendChild(div);
+  });
+
+  numbers.forEach((num, i) => {
+    const div = document.createElement('div');
+    div.className = 'section-number';
+    div.textContent = num;
+    div.style.cssText = `left:${pw * PCTS[i] - 30}px;bottom:${navH + 6}px`;
+    staticEls.appendChild(div);
+  });
+
+  // Connecting lines between adjacent systems
+  for (let i = 0; i < 4; i++) {
+    const x1 = pw * PCTS[i] + maxOrbits[i] * S;
+    const x2 = pw * PCTS[i + 1] - maxOrbits[i + 1] * S;
+    if (x2 > x1 + 4) {
+      const div = document.createElement('div');
+      div.className = 'connect-line';
+      div.style.cssText = `top:${cy}px;left:${x1}px;width:${x2 - x1}px`;
+      staticEls.appendChild(div);
+    }
+  }
+
+  // --- Build orbital systems ---
+  systemDefs.forEach((sys, i) => {
+    const cx = pw * PCTS[i];
+    const sBodyR = sys.bodyR * S;
+
+    // Central body (planet)
+    const body = document.createElement('div');
+    body.className = 'central-body';
+    const bD = sBodyR * 2;
+    body.style.cssText = `left:${cx - sBodyR}px;top:${cy - sBodyR}px;width:${bD}px;height:${bD}px`;
+    body.innerHTML = `<div class="central-body-inner"><div class="planet-gradient" style="background:${sys.bodyColor}"></div><div class="planet-shadow"></div></div>`;
+    orbContainer.appendChild(body);
+
+    // Concentric body rings
+    for (let r = 1; r <= 3; r++) {
+      const ring = document.createElement('div');
+      ring.className = 'body-rings';
+      const rSize = sBodyR * 2 + r * 14 * S;
+      ring.style.cssText = `left:${cx - rSize / 2}px;top:${cy - rSize / 2}px;width:${rSize}px;height:${rSize}px`;
+      orbContainer.appendChild(ring);
+    }
+
+    // Orbit rings
+    const scaledOrbits = sys.orbits.map(o => o * S);
+    scaledOrbits.forEach((orb, oi) => {
+      const ring = document.createElement('div');
+      ring.className = 'orbit' + (oi % 2 === 1 ? ' dashed' : '');
+      const oD = orb * 2;
+      ring.style.cssText = `left:${cx - orb}px;top:${cy - orb}px;width:${oD}px;height:${oD}px`;
+      orbContainer.appendChild(ring);
+    });
+
+    // Nodes (orbiting dots)
+    sys.nodes.forEach((comp, ni) => {
+      if (!sys.nodePositions[ni]) return;
+      const pos = sys.nodePositions[ni];
+      const orbR = scaledOrbits[pos.orbit];
+      const angleRad = (pos.angle * Math.PI) / 180;
+      const nx = cx + Math.cos(angleRad) * orbR;
+      const ny = cy + Math.sin(angleRad) * orbR;
+      const nodeSize = 6 + comp.w * 2;
+
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.style.cssText = `left:${nx - nodeSize / 2}px;top:${ny - nodeSize / 2}px;width:${nodeSize}px;height:${nodeSize}px`;
+      node.dataset.idx = allNodeEls.length;
+
+      node.innerHTML = `
+        <div class="node-dot">
+          <div class="node-core" style="background:${comp.color};box-shadow:0 0 ${4 + comp.w * 2}px ${comp.color}40"></div>
+          <div class="node-glow"></div>
+        </div>
+        <div class="node-label" style="left:${nodeSize + 6}px;top:50%;transform:translateY(-50%)">${comp.name}</div>
+        <div class="node-symbol" style="left:${nodeSize + 6}px;top:${nodeSize + 2}px;font-size:${8 + comp.w * 2}px">${comp.sym}</div>
+      `;
+
+      node.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showAnnotation(node, comp, nx, ny, nodeSize);
+      });
+
+      orbContainer.appendChild(node);
+      allNodeEls.push({ el: node, comp, x: nx, y: ny, size: nodeSize });
+    });
+  });
+
+  // Stars
+  canvas.width = pw;
+  canvas.height = ph;
+  drawStars(pw, ph);
+}
+
+function drawStars(w, h) {
+  ctx.clearRect(0, 0, w, h);
+  const count = Math.round((w * h) / 4800);
+  for (let i = 0; i < count; i++) {
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    const r = Math.random() * 1.2;
+    const a = Math.random() * 0.3 + 0.02;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.fill();
+  }
+}
+
+// ===== ANNOTATION SYSTEM =====
+function closeAnnotation() {
+  if (activeAnnotation) {
+    activeAnnotation.classList.remove('visible');
+    const el = activeAnnotation;
+    setTimeout(() => el.remove(), 400);
+  }
+  if (activeNode) activeNode.classList.remove('active');
+  activeNode = null;
+  activeAnnotation = null;
+}
+
+function showAnnotation(nodeEl, comp, nx, ny, nodeSize) {
+  closeAnnotation();
+
+  if (activeNode === nodeEl) return; // was toggling off
+
+  activeNode = nodeEl;
+  nodeEl.classList.add('active');
+
+  const pw = panorama.offsetWidth;
+  const viewH = panorama.offsetHeight - 44;
+  const above = ny > viewH * 0.5;
+  const annY = above ? ny - nodeSize / 2 - 170 : ny + nodeSize / 2 + 24;
+  const annX = Math.max(10, Math.min(nx - 100, pw - 210));
+
+  const ann = document.createElement('div');
+  ann.className = 'annotation';
+  ann.style.cssText = `left:${annX}px;top:${annY}px`;
+
+  ann.innerHTML = `
+    <div class="annotation-card">
+      <div class="annotation-head">
+        <div class="ann-element" style="background:${comp.color}08;border-color:${comp.color}18">
+          <span class="ann-w" style="color:${comp.color}">${comp.w}</span>
+          <span class="ann-sym" style="color:${comp.color}">${comp.sym}</span>
+          <span class="ann-nm">${comp.name}</span>
+        </div>
+        <div class="ann-info">
+          <h4 style="color:${comp.color}">${comp.name}</h4>
+          <div class="ann-cat">${comp.cat} &middot; ${comp.level}</div>
+        </div>
+      </div>
+      <div class="ann-body">
+        <div class="ann-desc">${comp.desc}</div>
+        <div class="ann-meta">
+          <div class="ann-meta-item"><div class="ann-meta-label">Weight</div><div class="ann-meta-value" style="color:${comp.color}">${comp.w}</div></div>
+          <div class="ann-meta-item"><div class="ann-meta-label">Level</div><div class="ann-meta-value">${comp.level}</div></div>
+          <div class="ann-meta-item"><div class="ann-meta-label">Children</div><div class="ann-meta-value">${comp.children}</div></div>
+        </div>
+        ${comp.comp.length ? `<div class="ann-composition">${comp.comp.map(c => `<span class="ann-comp-pill" style="color:rgba(255,255,255,0.35)">${c}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `;
+
+  annotationContainer.appendChild(ann);
+  requestAnimationFrame(() => ann.classList.add('visible'));
+  activeAnnotation = ann;
+}
+
+// Close on background click
+panorama.addEventListener('click', (e) => {
+  if (!e.target.closest('.node') && !e.target.closest('.annotation')) {
+    closeAnnotation();
+  }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAnnotation();
+  }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    const currentIdx = activeNode ? parseInt(activeNode.dataset.idx) : (dir === 1 ? -1 : 1);
+    const next = (currentIdx + dir + allNodeEls.length) % allNodeEls.length;
+    const n = allNodeEls[next];
+    showAnnotation(n.el, n.comp, n.x, n.y, n.size);
+  }
+});
+
+// ===== FULLSCREEN =====
+document.getElementById('fullscreenBtn').addEventListener('click', () => {
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      const el = document.documentElement;
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    }
+  } catch (e) {
+    window.open(window.location.href, '_blank');
+  }
+});
+
+// Rebuild on resize / fullscreen change
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(buildViz, 150);
+});
+document.addEventListener('fullscreenchange', () => setTimeout(buildViz, 100));
+document.addEventListener('webkitfullscreenchange', () => setTimeout(buildViz, 100));
+
+// Initial build
+buildViz();
+</script>
+</body>
+</html>

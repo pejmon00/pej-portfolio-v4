@@ -166,6 +166,21 @@ nav[aria-label="Primary"] a[aria-current="page"] {
   color: var(--text);
   background: var(--surface-2);
 }
+
+/* Mobile: tighten nav spacing so all links fit */
+@media (max-width: 480px) {
+  nav[aria-label="Primary"] .nav-inner {
+    padding: 0 var(--space-2);
+  }
+  nav[aria-label="Primary"] ul {
+    gap: var(--space-1);
+  }
+  nav[aria-label="Primary"] a {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+
 nav[aria-label="Primary"] {
   position: fixed;
   top: 0;
@@ -404,13 +419,15 @@ p {
 }
 .hero-logos [aria-label="Company logos"] {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--space-3);
   align-items: center;
 }
 .hero-logos img {
   height: calc(var(--logo-h) * 0.8);
   width: auto;
+  flex-shrink: 1;
+  min-width: 0;
   opacity: 0.85;
 }
 .hero-logos img:hover {

@@ -404,9 +404,16 @@ class Renderer {
             $sectionsHtml .= '      <hr class="section-divider" aria-hidden="true" />' . "\n";
             $sectionsHtml .= '      <section class="gallery-section" aria-labelledby="' . $slug . '">' . "\n";
             $sectionsHtml .= '        <h2 id="' . $slug . '" class="section-hero-title">' . self::esc($sec['label']) . '</h2>' . "\n";
-            $sectionsHtml .= '        <div class="gallery-grid">' . "\n";
-            $sectionsHtml .= self::buildGalleryProjectsHtml($projects);
-            $sectionsHtml .= '        </div>' . "\n";
+            // Interactive HTML sections get an iframe instead of a project grid
+            if ($sec['id'] === 'interactive-html') {
+                $sectionsHtml .= '        <div class="gallery-iframe-wrap">' . "\n";
+                $sectionsHtml .= '          <iframe src="/gallery/atomic-anatomy.html" title="Anatomy of an Atomic Design System" loading="lazy"></iframe>' . "\n";
+                $sectionsHtml .= '        </div>' . "\n";
+            } else {
+                $sectionsHtml .= '        <div class="gallery-grid">' . "\n";
+                $sectionsHtml .= self::buildGalleryProjectsHtml($projects);
+                $sectionsHtml .= '        </div>' . "\n";
+            }
             $sectionsHtml .= '      </section>' . "\n\n";
         }
 

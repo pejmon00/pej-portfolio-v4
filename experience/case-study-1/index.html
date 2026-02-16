@@ -103,7 +103,7 @@
         margin: 0 0 6px;
       }
       .pt-header .pt-subtitle {
-        font-size: 0.8rem;
+        font-size: 0.95rem;
         color: var(--pt-text-dim);
         font-weight: 400;
         letter-spacing: 0.15em;
@@ -123,7 +123,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         color: var(--pt-text-dim);
         text-transform: uppercase;
         letter-spacing: 0.08em;
@@ -151,7 +151,7 @@
         padding: 6px 0;
         text-align: center;
         border-radius: 6px;
-        font-size: 0.6rem;
+        font-size: 0.72rem;
         color: var(--pt-text-dim);
         letter-spacing: 0.05em;
         border: 1px solid var(--pt-border);
@@ -169,7 +169,7 @@
       /* Periodic Table Grid */
       .pt-grid {
         display: grid;
-        grid-template-columns: repeat(18, 1fr);
+        grid-template-columns: repeat(10, 1fr);
         gap: 4px;
       }
 
@@ -203,22 +203,23 @@
 
       .pt-tile .pt-w {
         position: absolute;
-        top: 3px; left: 5px;
-        font-size: 0.5rem;
+        top: 4px; left: 6px;
+        font-size: 0.6rem;
         font-weight: 600;
         font-family: 'JetBrains Mono', monospace;
         opacity: 0.6;
         color: var(--pt-text);
       }
       .pt-tile .pt-sym {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 1;
-        margin-bottom: 1px;
+        margin-top: 6px;
+        margin-bottom: 2px;
       }
       .pt-tile .pt-name {
-        font-size: 0.42rem;
+        font-size: 0.5rem;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.06em;
@@ -346,7 +347,7 @@
       }
       .pt-detail-tile-preview .pt-sym { font-size: 1.8rem; font-weight: 700; }
       .pt-detail-tile-preview .pt-weight-badge {
-        font-size: 0.6rem;
+        font-size: 0.85rem;
         font-family: 'JetBrains Mono', monospace;
         font-weight: 600;
         opacity: 0.6;
@@ -372,7 +373,7 @@
       }
       .pt-meta-item { text-align: center; }
       .pt-meta-item .pt-meta-label {
-        font-size: 0.6rem;
+        font-size: 0.72rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         color: var(--pt-text-muted);
@@ -418,9 +419,9 @@
       /* Responsive */
       @media (max-width: 1100px) {
         .pt-grid { gap: 3px; }
-        .pt-tile .pt-sym { font-size: 0.9rem; }
-        .pt-tile .pt-name { font-size: 0.35rem; }
-        .pt-tile .pt-w { font-size: 0.4rem; }
+        .pt-tile .pt-sym { font-size: 1.2rem; }
+        .pt-tile .pt-name { font-size: 0.42rem; }
+        .pt-tile .pt-w { font-size: 0.5rem; }
       }
       @media (max-width: 768px) {
         .pt-hero { padding: 20px 10px; overflow-x: auto; overflow-y: hidden; border-radius: 8px; -webkit-overflow-scrolling: touch; }
@@ -441,12 +442,12 @@
         .pt-legend::-webkit-scrollbar { display: none; }
         .pt-legend-item { font-size: 0.6rem; padding: 4px 8px; white-space: nowrap; flex-shrink: 0; }
         .pt-grid {
-          min-width: 700px;
+          min-width: 540px;
           gap: 3px;
         }
-        .pt-tile .pt-sym { font-size: 0.85rem; }
-        .pt-tile .pt-name { font-size: 0.35rem; }
-        .pt-tile .pt-w { font-size: 0.4rem; top: 2px; left: 3px; }
+        .pt-tile .pt-sym { font-size: 1rem; }
+        .pt-tile .pt-name { font-size: 0.38rem; }
+        .pt-tile .pt-w { font-size: 0.45rem; }
       }
       @media (max-width: 480px) {
         .pt-hero { padding: 14px 8px; }
@@ -755,11 +756,18 @@
       ];
 
       const grid = document.getElementById('ptGrid');
-      const totalRows = 6, totalCols = 18;
+      const totalRows = 6, totalCols = 10;
+
+      // Remap 18-col periodic table to compact 10-col layout
+      function remapCol(c) {
+        if (c <= 5) return c;
+        if (c >= 14) return c - 8; // 14→6, 15→7, 16→8, 17→9, 18→10
+        return c;
+      }
 
       for (let r = 1; r <= totalRows; r++) {
         for (let c = 1; c <= totalCols; c++) {
-          const comp = components.find(function(x) { return x.row === r && x.col === c; });
+          const comp = components.find(function(x) { return x.row === r && remapCol(x.col) === c; });
           if (comp) {
             var tile = document.createElement('button');
             tile.className = 'pt-tile pt-' + comp.cat;

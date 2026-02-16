@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glass Window Manager — Design System Layers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --primitives: #6366f1;
+    --inputs: #f43f5e;
+    --display: #f59e0b;
+    --navigation: #10b981;
+    --feedback: #8b5cf6;
+    --layout: #06b6d4;
+    --overlay: #ec4899;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #06060b;
+    color: #e4e4ef;
+    height: 100vh;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* Ambient background */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+
+  .ambient-orb:nth-child(1) { width: 600px; height: 600px; background: var(--primitives); top: -200px; left: -100px; animation-delay: 0s; }
+  .ambient-orb:nth-child(2) { width: 500px; height: 500px; background: var(--overlay); bottom: -200px; right: -100px; animation-delay: -5s; }
+  .ambient-orb:nth-child(3) { width: 400px; height: 400px; background: var(--navigation); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -10s; }
+  .ambient-orb:nth-child(4) { width: 350px; height: 350px; background: var(--display); top: 20%; right: 20%; animation-delay: -15s; }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+    100% { transform: translate(10px, 10px) scale(1.02); }
+  }
+
+  /* Grid lines */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+  }
+
+  /* Header HUD */
+  .hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 30px;
+    background: rgba(6,6,11,0.6);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .hud-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .hud-logo {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6b6b80;
+  }
+
+  .hud-logo span { color: #e4e4ef; }
+
+  .hud-divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .hud-active {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e4e4ef;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hud-active .active-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+
+  .hud-active .active-label {
+    transition: color 0.3s;
+  }
+
+  .hud-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hud-meta {
+    font-size: 0.6rem;
+    color: #3a3a4f;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .layer-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .layer-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .layer-dot.active {
+    transform: scale(1.3);
+    border-color: transparent;
+  }
+
+  /* 3D Scene */
+  .scene {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    perspective: 2200px;
+    perspective-origin: 50% 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scene-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  /* Glass Panes */
+  .glass-pane {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .glass-pane::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    pointer-events: none;
+    z-index: 2;
+    transition: border-color 0.5s ease;
+  }
+
+  .glass-pane:hover::before {
+    border-color: rgba(255,255,255,0.22);
+  }
+
+  .glass-pane::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%, rgba(255,255,255,0.02) 100%);
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .glass-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(12,12,20,0.55);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  .glass-pane.focused {
+    z-index: 100 !important;
+  }
+
+  .glass-pane.focused::before {
+    border-color: rgba(255,255,255,0.25);
+    box-shadow: 0 0 40px rgba(255,255,255,0.03);
+  }
+
+  /* Receded but still clickable */
+  .glass-pane.receded {
+    opacity: 0.35;
+    filter: blur(1px);
+    cursor: pointer;
+  }
+
+  .glass-pane.receded:hover {
+    opacity: 0.6;
+    filter: blur(0px);
+  }
+
+  /* Pane title bar */
+  .pane-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .pane-title-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pane-element-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .pane-element-badge .badge-weight {
+    font-size: 0.55rem;
+    opacity: 0.5;
+  }
+
+  .pane-title-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .pane-title-right {
+    display: flex;
+    gap: 6px;
+  }
+
+  .pane-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  /* Component content styles */
+  .comp-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  /* Shared mini-component styles */
+  .mini-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    cursor: default;
+    color: white;
+  }
+
+  .mini-btn-ghost {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #aaa;
+  }
+
+  .mini-input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75rem;
+    color: #6b6b80;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .mini-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b6b80;
+  }
+
+  .mini-text {
+    font-size: 0.8rem;
+    color: #8b8ba0;
+    line-height: 1.5;
+  }
+
+  .mini-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .mini-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .mini-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.6rem;
+    font-weight: 600;
+  }
+
+  .mini-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mini-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mini-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ccc;
+  }
+
+  .mini-sub {
+    font-size: 0.6rem;
+    color: #555;
+  }
+
+  /* Keyboard hint */
+  .keyboard-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    display: flex;
+    gap: 16px;
+    padding: 10px 20px;
+    background: rgba(12,12,20,0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    font-size: 0.65rem;
+    color: #4a4a60;
+  }
+
+  .key-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .key {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: #6b6b80;
+  }
+
+  /* Depth indicator */
+  .depth-indicator {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .depth-line {
+    width: 2px;
+    height: 60px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 1px;
+    position: relative;
+  }
+
+  .depth-marker {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: -3px;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+  }
+
+  .depth-label {
+    font-size: 0.5rem;
+    color: #3a3a4f;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    writing-mode: vertical-lr;
+    margin-top: 8px;
+  }
+
+  .focus-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03), transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .focus-flash.active {
+    opacity: 1;
+  }
+
+  /* Big component name watermark for nav panes */
+  .pane-watermark {
+    position: absolute;
+    bottom: 14px;
+    right: 20px;
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Exaggerated nav styles */
+  .nav-big-label {
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    opacity: 0.12;
+    position: absolute;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="ambient-orb"></div>
+  <div class="ambient-orb"></div>
+  <div class="ambient-orb"></div>
+  <div class="ambient-orb"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="focus-flash" id="focusFlash"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hud-logo"><span>GLASS</span> &middot; UI</div>
+    <div class="hud-divider"></div>
+    <div class="hud-active">
+      <div class="active-dot" id="activeDot"></div>
+      <span class="active-label" id="activeLabel">Select a layer</span>
+    </div>
+  </div>
+  <div class="hud-right">
+    <div class="hud-meta" id="hudMeta">7 layers &middot; 3D depth</div>
+    <div class="layer-dots" id="layerDots"></div>
+  </div>
+</div>
+
+<!-- 3D Scene -->
+<div class="scene" id="scene">
+  <div class="scene-inner" id="sceneInner"></div>
+</div>
+
+<!-- Depth Indicator -->
+<div class="depth-indicator" id="depthIndicator">
+  <div class="depth-line" id="depthLine"></div>
+  <div class="depth-label">Depth</div>
+</div>
+
+<!-- Keyboard hints -->
+<div class="keyboard-hint">
+  <div class="key-hint"><span class="key">&larr;</span><span class="key">&rarr;</span> Navigate</div>
+  <div class="key-hint"><span class="key">Esc</span> Reset</div>
+  <div class="key-hint"><span class="key">Click</span> Focus layer</div>
+</div>
+
+<script>
+const layers = [
+  {
+    id: 'card',
+    symbol: 'Cd',
+    weight: 4,
+    name: 'Card',
+    cat: 'layout',
+    color: '#06b6d4',
+    w: 360, h: 320,
+    content: `
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div style="width:100%;height:100px;border-radius:10px;background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(99,102,241,0.1));display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(6,182,212,0.5)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+        </div>
+        <div style="margin-top:12px">
+          <div class="mini-name" style="font-size:0.85rem">System Status Card</div>
+          <div class="mini-text" style="margin-top:6px">All services operational. Last checked 2 minutes ago.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:auto">
+          <div class="mini-btn" style="background:rgba(6,182,212,0.15);color:#06b6d4;flex:1;justify-content:center">View Details</div>
+          <div class="mini-btn-ghost" style="padding:8px 16px;border-radius:8px;font-size:0.75rem">Dismiss</div>
+        </div>
+      </div>
+      <div class="pane-watermark" style="color:#06b6d4">Cd</div>
+    `
+  },
+  {
+    id: 'toast',
+    symbol: 'Ts',
+    weight: 3,
+    name: 'Toast',
+    cat: 'feedback',
+    color: '#8b5cf6',
+    w: 400, h: 110,
+    content: `
+      <div style="display:flex;align-items:center;gap:14px;height:100%;position:relative;z-index:1">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div style="flex:1">
+          <div class="mini-name" style="font-size:0.85rem">Changes saved</div>
+          <div class="mini-sub" style="color:#6b6b80;font-size:0.7rem">Your settings have been updated successfully.</div>
+        </div>
+        <div style="color:#3a3a4f;font-size:1.4rem;cursor:default">&times;</div>
+      </div>
+      <div class="pane-watermark" style="color:#8b5cf6;bottom:8px">Ts</div>
+    `
+  },
+  {
+    id: 'modal',
+    symbol: 'Md',
+    weight: 5,
+    name: 'Modal',
+    cat: 'overlay',
+    color: '#ec4899',
+    w: 440, h: 360,
+    content: `
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="mini-name" style="font-size:1rem">Confirm Action</div>
+          <div style="color:#3a3a4f;font-size:1.3rem;cursor:default">&times;</div>
+        </div>
+        <div class="mini-divider"></div>
+        <div class="mini-text" style="margin:16px 0">Are you sure you want to deploy to production? This action will affect all active users.</div>
+        <div class="mini-label" style="margin-bottom:6px">Deployment note</div>
+        <div class="mini-input" style="margin-bottom:16px">v2.4.1 — performance improvements</div>
+        <div style="display:flex;gap:8px;margin-top:auto">
+          <div class="mini-btn-ghost" style="padding:10px 20px;border-radius:8px;font-size:0.75rem;flex:1;text-align:center;display:flex;justify-content:center">Cancel</div>
+          <div class="mini-btn" style="background:rgba(236,72,153,0.2);color:#ec4899;flex:1;justify-content:center">Deploy</div>
+        </div>
+      </div>
+      <div class="pane-watermark" style="color:#ec4899">Md</div>
+    `
+  },
+  {
+    id: 'navbar',
+    symbol: 'Nb',
+    weight: 5,
+    name: 'Navbar',
+    cat: 'navigation',
+    color: '#10b981',
+    w: 820, h: 140,
+    content: `
+      <div style="display:flex;align-items:center;height:100%;gap:30px;position:relative;z-index:1">
+        <div style="font-weight:900;font-size:1.6rem;color:#10b981;letter-spacing:-0.03em;flex-shrink:0">&#9670; Acme</div>
+        <div style="display:flex;gap:28px;flex:1">
+          <span style="font-size:1.05rem;color:#e4e4ef;font-weight:600;position:relative">Dashboard<span style="position:absolute;bottom:-6px;left:0;right:0;height:2px;background:#10b981;border-radius:1px"></span></span>
+          <span style="font-size:1.05rem;color:#6b6b80;font-weight:500">Projects</span>
+          <span style="font-size:1.05rem;color:#6b6b80;font-weight:500">Analytics</span>
+          <span style="font-size:1.05rem;color:#6b6b80;font-weight:500">Team</span>
+          <span style="font-size:1.05rem;color:#6b6b80;font-weight:500">Settings</span>
+        </div>
+        <div class="mini-input" style="padding:10px 18px;font-size:0.8rem;width:180px;border-radius:10px">Search...</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:10px;height:10px;border-radius:50%;background:rgba(16,185,129,0.4);box-shadow:0 0 8px rgba(16,185,129,0.3)"></div>
+          <div class="mini-avatar" style="width:38px;height:38px;background:rgba(16,185,129,0.2);font-size:0.85rem;color:#10b981;border:2px solid rgba(16,185,129,0.3)">PJ</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:50%;right:30px;transform:translateY(-50%);font-size:6rem;font-weight:900;color:#10b981;opacity:0.04;pointer-events:none;letter-spacing:-0.04em;z-index:0">NAVBAR</div>
+    `
+  },
+  {
+    id: 'form',
+    symbol: 'Fm',
+    weight: 5,
+    name: 'Form',
+    cat: 'inputs',
+    color: '#f43f5e',
+    w: 360, h: 380,
+    content: `
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div class="mini-name" style="font-size:0.95rem;margin-bottom:4px">Create Account</div>
+        <div class="mini-sub" style="color:#4a4a60;margin-bottom:16px">Enter your details below</div>
+        <div class="mini-label" style="margin-bottom:4px">Full name</div>
+        <div class="mini-input" style="margin-bottom:12px">Pej Aryanpour</div>
+        <div class="mini-label" style="margin-bottom:4px">Email</div>
+        <div class="mini-input" style="margin-bottom:12px">pej@example.com</div>
+        <div class="mini-label" style="margin-bottom:4px">Password</div>
+        <div class="mini-input" style="margin-bottom:16px">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid rgba(244,63,94,0.4);display:flex;align-items:center;justify-content:center">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <span style="font-size:0.65rem;color:#6b6b80">I agree to the terms</span>
+        </div>
+        <div class="mini-btn" style="background:rgba(244,63,94,0.2);color:#f43f5e;justify-content:center;width:100%;border-radius:8px">Sign Up</div>
+      </div>
+      <div class="pane-watermark" style="color:#f43f5e">Fm</div>
+    `
+  },
+  {
+    id: 'table',
+    symbol: 'Tl',
+    weight: 5,
+    name: 'Table',
+    cat: 'display',
+    color: '#f59e0b',
+    w: 480, h: 300,
+    content: `
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="mini-name" style="font-size:0.9rem">Recent Orders</div>
+          <div class="mini-badge" style="background:rgba(245,158,11,0.12);color:#f59e0b">142 total</div>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:#3a3a4f;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <span>Customer</span><span>Product</span><span>Amount</span><span>Status</span>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.7rem;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center">
+            <div class="mini-row" style="gap:6px"><div class="mini-avatar" style="width:22px;height:22px;background:rgba(99,102,241,0.2);font-size:0.5rem;color:#6366f1">AK</div><span style="color:#ccc">A. Kim</span></div>
+            <span style="color:#6b6b80">Pro Plan</span>
+            <span style="color:#ccc;font-family:'JetBrains Mono',monospace;font-size:0.65rem">$49.00</span>
+            <span class="mini-badge" style="background:rgba(16,185,129,0.12);color:#10b981;font-size:0.55rem">Paid</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.7rem;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center">
+            <div class="mini-row" style="gap:6px"><div class="mini-avatar" style="width:22px;height:22px;background:rgba(236,72,153,0.2);font-size:0.5rem;color:#ec4899">MR</div><span style="color:#ccc">M. Rivera</span></div>
+            <span style="color:#6b6b80">Enterprise</span>
+            <span style="color:#ccc;font-family:'JetBrains Mono',monospace;font-size:0.65rem">$199.00</span>
+            <span class="mini-badge" style="background:rgba(245,158,11,0.12);color:#f59e0b;font-size:0.55rem">Pending</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 0.8fr;gap:0;font-size:0.7rem;padding:10px 0;align-items:center">
+            <div class="mini-row" style="gap:6px"><div class="mini-avatar" style="width:22px;height:22px;background:rgba(6,182,212,0.2);font-size:0.5rem;color:#06b6d4">JL</div><span style="color:#ccc">J. Lee</span></div>
+            <span style="color:#6b6b80">Starter</span>
+            <span style="color:#ccc;font-family:'JetBrains Mono',monospace;font-size:0.65rem">$12.00</span>
+            <span class="mini-badge" style="background:rgba(16,185,129,0.12);color:#10b981;font-size:0.55rem">Paid</span>
+          </div>
+        </div>
+      </div>
+      <div class="pane-watermark" style="color:#f59e0b">Tl</div>
+    `
+  },
+  {
+    id: 'sidebar',
+    symbol: 'Sd',
+    weight: 5,
+    name: 'Sidebar',
+    cat: 'navigation',
+    color: '#10b981',
+    w: 320, h: 560,
+    content: `
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;color:#10b981">A</div>
+          <div>
+            <div style="font-size:0.9rem;font-weight:700;color:#e4e4ef">Acme Corp</div>
+            <div style="font-size:0.65rem;color:#3a3a4f">Free plan</div>
+          </div>
+        </div>
+
+        <div class="mini-label" style="margin-bottom:10px;font-size:0.6rem">Main</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:24px">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.12)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span style="font-size:0.9rem;font-weight:600;color:#10b981">Dashboard</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Projects</span>
+            <span class="mini-badge" style="background:rgba(139,92,246,0.12);color:#8b5cf6;margin-left:auto;font-size:0.6rem">3</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Activity</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Team</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Messages</span>
+            <span style="width:8px;height:8px;border-radius:50%;background:#f43f5e;margin-left:auto;box-shadow:0 0 6px rgba(244,63,94,0.4)"></span>
+          </div>
+        </div>
+
+        <div class="mini-label" style="margin-bottom:10px;font-size:0.6rem">Settings</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Preferences</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a4a60" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style="font-size:0.9rem;color:#8b8ba0">Security</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;bottom:20px;left:24px;right:24px;z-index:0">
+        <div style="font-size:5.5rem;font-weight:900;color:#10b981;opacity:0.04;letter-spacing:-0.04em;line-height:0.85">SIDE<br>BAR</div>
+      </div>
+    `
+  }
+];
+
+// 3D positioning — Navbar and Sidebar get prominent positions
+const positions = [
+  { x: -50,  y: 20,   z: -100,  rx: 2,  ry: -6  },   // Card
+  { x: 180,  y: -120, z: -250,  rx: -2, ry: 4   },   // Toast
+  { x: -20,  y: 30,   z: -420,  rx: 1,  ry: -3  },   // Modal
+  { x: 0,    y: -180, z: 50,    rx: 6,  ry: 0   },   // Navbar — FRONT, top, huge
+  { x: -200, y: 60,   z: -320,  rx: 0,  ry: 10  },   // Form
+  { x: 120,  y: 80,   z: -520,  rx: -2, ry: -5  },   // Table
+  { x: -320, y: -40,  z: -50,   rx: -1, ry: 14  },   // Sidebar — FRONT, left, tall
+];
+
+const sceneInner = document.getElementById('sceneInner');
+const layerDotsContainer = document.getElementById('layerDots');
+const depthLine = document.getElementById('depthLine');
+
+let focusedIndex = -1;
+let paneElements = [];
+
+// Create panes
+layers.forEach((layer, i) => {
+  const pos = positions[i];
+
+  const pane = document.createElement('div');
+  pane.className = 'glass-pane';
+  pane.style.width = layer.w + 'px';
+  pane.style.height = layer.h + 'px';
+  pane.style.zIndex = 10 + i;
+  pane.dataset.index = i;
+
+  setNormalTransform(pane, pos);
+
+  pane.innerHTML = `
+    <div class="glass-inner">
+      <div class="pane-titlebar">
+        <div class="pane-title-left">
+          <div class="pane-element-badge" style="background:${layer.color}15;color:${layer.color}">
+            <span class="badge-weight">${layer.weight}</span>
+            ${layer.symbol}
+          </div>
+          <span class="pane-title-text">${layer.name}</span>
+        </div>
+        <div class="pane-title-right">
+          <div class="pane-dot" style="background:#f43f5e"></div>
+          <div class="pane-dot" style="background:#f59e0b"></div>
+          <div class="pane-dot" style="background:#10b981"></div>
+        </div>
+      </div>
+      <div class="comp-content">${layer.content}</div>
+    </div>
+  `;
+
+  pane.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (focusedIndex === i) {
+      resetView();
+    } else {
+      focusOn(i);
+    }
+  });
+
+  sceneInner.appendChild(pane);
+  paneElements.push(pane);
+
+  // HUD dot
+  const dot = document.createElement('div');
+  dot.className = 'layer-dot';
+  dot.style.borderColor = layer.color + '40';
+  dot.dataset.index = i;
+  dot.addEventListener('click', (e) => {
+    e.stopPropagation();
+    focusOn(i);
+  });
+  layerDotsContainer.appendChild(dot);
+
+  // Depth marker
+  const marker = document.createElement('div');
+  marker.className = 'depth-marker';
+  marker.style.background = layer.color;
+  marker.style.boxShadow = `0 0 8px ${layer.color}60`;
+  const maxZ = 600;
+  const depthPercent = ((pos.z + maxZ) / (maxZ * 1.2)) * 100;
+  marker.style.top = Math.max(0, Math.min(100, 100 - depthPercent)) + '%';
+  marker.dataset.index = i;
+  marker.addEventListener('click', (e) => {
+    e.stopPropagation();
+    focusOn(i);
+  });
+  depthLine.appendChild(marker);
+});
+
+function setNormalTransform(pane, pos) {
+  pane.style.transform = `translate(-50%, -50%) translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${pos.rx}deg) rotateY(${pos.ry}deg)`;
+}
+
+function focusOn(index) {
+  focusedIndex = index;
+  const layer = layers[index];
+
+  // Flash
+  const flash = document.getElementById('focusFlash');
+  flash.classList.add('active');
+  setTimeout(() => flash.classList.remove('active'), 400);
+
+  // HUD
+  document.getElementById('activeDot').style.background = layer.color;
+  document.getElementById('activeLabel').textContent = `${layer.symbol} \u2014 ${layer.name}`;
+  document.getElementById('activeLabel').style.color = layer.color;
+  document.getElementById('hudMeta').textContent = `Weight ${layer.weight} \u00b7 ${layer.cat}`;
+
+  document.querySelectorAll('.layer-dot').forEach((d, di) => {
+    if (di === index) {
+      d.classList.add('active');
+      d.style.background = layers[di].color;
+    } else {
+      d.classList.remove('active');
+      d.style.background = 'transparent';
+    }
+  });
+
+  // Panes — focused comes to center, others spread out but remain clickable
+  paneElements.forEach((pane, pi) => {
+    if (pi === index) {
+      pane.classList.add('focused');
+      pane.classList.remove('receded');
+      pane.style.transform = `translate(-50%, -50%) translate3d(0px, 0px, 150px) rotateX(0deg) rotateY(0deg)`;
+      pane.style.zIndex = 100;
+    } else {
+      pane.classList.remove('focused');
+      pane.classList.add('receded');
+      const p = positions[pi];
+      // Spread receded layers further apart so they're visible and clickable around edges
+      const spreadX = p.x * 1.4;
+      const spreadY = p.y * 1.1;
+      const spreadZ = p.z - 350;
+      pane.style.transform = `translate(-50%, -50%) translate3d(${spreadX}px, ${spreadY}px, ${spreadZ}px) rotateX(${p.rx}deg) rotateY(${p.ry}deg)`;
+      pane.style.zIndex = 10 + pi;
+    }
+  });
+}
+
+function resetView() {
+  focusedIndex = -1;
+
+  document.getElementById('activeDot').style.background = 'transparent';
+  document.getElementById('activeLabel').textContent = 'Select a layer';
+  document.getElementById('activeLabel').style.color = '#e4e4ef';
+  document.getElementById('hudMeta').textContent = '7 layers \u00b7 3D depth';
+
+  document.querySelectorAll('.layer-dot').forEach(d => {
+    d.classList.remove('active');
+    d.style.background = 'transparent';
+  });
+
+  paneElements.forEach((pane, pi) => {
+    pane.classList.remove('focused', 'receded');
+    setNormalTransform(pane, positions[pi]);
+    pane.style.zIndex = 10 + pi;
+  });
+}
+
+// Background click resets
+document.getElementById('scene').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('scene') || e.target === document.getElementById('sceneInner')) {
+    resetView();
+  }
+});
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    resetView();
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    const next = focusedIndex < layers.length - 1 ? focusedIndex + 1 : 0;
+    focusOn(next);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const prev = focusedIndex > 0 ? focusedIndex - 1 : layers.length - 1;
+    focusOn(prev);
+  }
+});
+
+// Parallax
+let mouseX = 0, mouseY = 0;
+let targetRX = 0, targetRY = 0;
+let currentRX = 0, currentRY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  targetRY = mouseX * 5;
+  targetRX = -mouseY * 3;
+});
+
+function animateParallax() {
+  currentRX += (targetRX - currentRX) * 0.04;
+  currentRY += (targetRY - currentRY) * 0.04;
+
+  if (focusedIndex === -1) {
+    sceneInner.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg)`;
+  } else {
+    sceneInner.style.transform = `rotateX(${currentRX * 0.2}deg) rotateY(${currentRY * 0.2}deg)`;
+  }
+
+  requestAnimationFrame(animateParallax);
+}
+
+animateParallax();
+</script>
+</body>
+</html>

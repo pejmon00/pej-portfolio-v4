@@ -7,10 +7,6 @@
   margin-top: var(--space-4);
 }
 
-.gallery-section:last-of-type {
-  min-height: 80vh;
-}
-
 .gallery-section h2 {
   margin-bottom: var(--space-1);
 }

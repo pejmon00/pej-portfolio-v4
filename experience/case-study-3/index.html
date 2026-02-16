@@ -74,7 +74,7 @@
       }
       .wd-header-left { display: flex; flex-direction: column; gap: 2px; }
       .wd-title {
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: 800;
         letter-spacing: -0.02em;
         display: flex;
@@ -84,7 +84,7 @@
         margin: 0;
       }
       .wd-title-badge {
-        font-size: 0.5rem;
+        font-size: 0.6rem;
         padding: 2px 6px;
         border-radius: 5px;
         background: rgba(99,102,241,0.1);
@@ -93,12 +93,12 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-      .wd-subtitle { font-size: 0.6rem; color: #3a3a4f; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+      .wd-subtitle { font-size: 0.75rem; color: #3a3a4f; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
       .wd-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
       .wd-filter {
         padding: 6px 14px;
         border-radius: 8px;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: #6b6b80;
         border: 1px solid #1a1a28;
@@ -180,9 +180,9 @@
         transition: all 0.3s ease;
       }
       .wd-card.wd-selected .wd-el-tile { border-color: rgba(255,255,255,0.12); transform: scale(1.06); }
-      .wd-el-tile .wd-el-w { position: absolute; top: 3px; left: 5px; font-size: 0.4rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; opacity: 0.5; }
-      .wd-el-tile .wd-el-sym { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
-      .wd-el-tile .wd-el-name { font-size: 0.35rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-top: 1px; }
+      .wd-el-tile .wd-el-w { position: absolute; top: 3px; left: 5px; font-size: 0.48rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; opacity: 0.5; }
+      .wd-el-tile .wd-el-sym { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+      .wd-el-tile .wd-el-name { font-size: 0.42rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-top: 1px; }
 
       /* Widget body */
       .wd-card-body { padding: 10px; padding-left: 64px; min-height: 110px; display: flex; flex-direction: column; position: relative; z-index: 1; }
@@ -190,16 +190,16 @@
       .wd-watermark { position: absolute; bottom: 6px; right: 10px; font-size: 2rem; font-weight: 900; opacity: 0.025; pointer-events: none; z-index: 0; line-height: 1; letter-spacing: -0.04em; }
 
       /* Mini component styles */
-      .wd-hero .wm-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; font-size: 0.55rem; font-weight: 600; border: none; cursor: default; }
-      .wd-hero .wm-btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #888; padding: 5px 10px; border-radius: 6px; font-size: 0.55rem; font-weight: 500; }
-      .wd-hero .wm-input { padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); font-size: 0.55rem; color: #6b6b80; font-family: inherit; }
-      .wd-hero .wm-label { font-size: 0.45rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #3a3a4f; }
-      .wd-hero .wm-text { font-size: 0.55rem; color: #6b6b80; line-height: 1.4; }
-      .wd-hero .wm-title { font-size: 0.65rem; font-weight: 700; color: #ccc; }
-      .wd-hero .wm-sub { font-size: 0.5rem; color: #444; }
+      .wd-hero .wm-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 600; border: none; cursor: default; }
+      .wd-hero .wm-btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #888; padding: 5px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 500; }
+      .wd-hero .wm-input { padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); font-size: 0.65rem; color: #6b6b80; font-family: inherit; }
+      .wd-hero .wm-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #3a3a4f; }
+      .wd-hero .wm-text { font-size: 0.65rem; color: #6b6b80; line-height: 1.4; }
+      .wd-hero .wm-title { font-size: 0.75rem; font-weight: 700; color: #ccc; }
+      .wd-hero .wm-sub { font-size: 0.6rem; color: #444; }
       .wd-hero .wm-divider { height: 1px; background: rgba(255,255,255,0.04); }
-      .wd-hero .wm-avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; flex-shrink: 0; }
-      .wd-hero .wm-badge { padding: 1px 5px; border-radius: 6px; font-size: 0.45rem; font-weight: 600; }
+      .wd-hero .wm-avatar { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; flex-shrink: 0; }
+      .wd-hero .wm-badge { padding: 1px 5px; border-radius: 6px; font-size: 0.55rem; font-weight: 600; }
       .wd-hero .wm-row { display: flex; align-items: center; gap: 6px; }
       .wd-hero .wm-col { display: flex; flex-direction: column; gap: 2px; }
       .wd-hero .wm-progress { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.04); overflow: hidden; }
@@ -255,8 +255,8 @@
 
       .wd-focus-info { flex: 1; }
       .wd-focus-info h3 { font-size: 1rem; font-weight: 800; margin: 0 0 2px; color: #e4e4ef; }
-      .wd-focus-info .wd-focus-cat { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-      .wd-focus-info .wd-focus-desc { font-size: 0.65rem; color: #6b6b80; line-height: 1.5; margin: 0; }
+      .wd-focus-info .wd-focus-cat { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+      .wd-focus-info .wd-focus-desc { font-size: 0.75rem; color: #6b6b80; line-height: 1.5; margin: 0; }
 
       .wd-focus-close {
         position: absolute;
